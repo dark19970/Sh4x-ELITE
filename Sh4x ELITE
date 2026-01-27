@@ -1,7 +1,6 @@
 --[[
-    Sh4x - ELITE SECURITY EDITION
-    Features: Staff Check, Raycasting, Tween Bypass, Remote Protection
-    Compatibility: MoonSec / Luraph Style
+    Sh4x - ULTRA SPEED EDITION
+    Focus: MAXIMUM MINING SPEED
     Security: ANTI-KICK / ANTI-AFK / OBFUSCATION / BYPASS
     Visuals: RED THEME + RGB BORDERS
 ]]
@@ -15,32 +14,21 @@ local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local Player = Players.LocalPlayer
 
--- [STAFF CHECK] Auto-Desconexão se um ADM entrar
-local function staffCheck()
-    Players.PlayerAdded:Connect(function(player)
-        -- Verifica se o jogador que entrou tem cargo de Staff (exemplo comum de IDs ou nomes)
-        if player:GetRankInGroup(0) > 100 or player.Name:lower():find("admin") or player.Name:lower():find("mod") then
-            Player:Kick("Sh4x Security: Staff detectado no servidor (" .. player.Name .. ")")
+-- [ANTI-KICK PROTECTION]
+local function applyAntiKick()
+    local gmt = getrawmetatable(game)
+    if setreadonly then setreadonly(gmt, false) end
+    local oldNamecall = gmt.__namecall
+    gmt.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        if tostring(method):lower() == "kick" then
+            return nil
         end
+        return oldNamecall(self, ...)
     end)
+    if setreadonly then setreadonly(gmt, true) end
 end
-task.spawn(staffCheck)
-
--- [REMOTE SPY PROTECTION] Proteção contra interceptação de remotes
-local function protectRemotes()
-    if hookmetamethod then
-        local oldNamecall
-        oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-            local method = getnamecallmethod()
-            if not checkcaller() and (method == "FireServer" or method == "InvokeServer") then
-                -- Adiciona um delay randômico para enganar espiões de remotes
-                task.wait(math.random(1, 5) / 100)
-            end
-            return oldNamecall(self, ...)
-        end)
-    end
-end
-pcall(protectRemotes)
+pcall(applyAntiKick)
 
 -- [ANTI-AFK]
 Player.Idled:Connect(function()
@@ -60,9 +48,9 @@ ScreenGui.Parent = CoreGui
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = generateID()
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(35, 0, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
 MainFrame.Position = UDim2.new(0.5, -110, 0.5, -80)
-MainFrame.Size = UDim2.new(0, 220, 0, 170)
+MainFrame.Size = UDim2.new(0, 220, 0, 160)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
 local Stroke = Instance.new("UIStroke", MainFrame)
@@ -72,16 +60,16 @@ local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Sh4x ELITE"
+Title.Text = "Sh4x ULTRA SPEED"
 Title.TextSize = 16
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 local ToggleBtn = Instance.new("TextButton", MainFrame)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(55, 0, 0)
-ToggleBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
-ToggleBtn.Size = UDim2.new(0.8, 0, 0, 35)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.35, 0)
+ToggleBtn.Size = UDim2.new(0.8, 0, 0, 40)
 ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.Text = "START ELITE FARM"
+ToggleBtn.Text = "START ULTRA FARM"
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 Instance.new("UICorner", ToggleBtn)
 
@@ -89,22 +77,13 @@ local BtnStroke = Instance.new("UIStroke", ToggleBtn)
 BtnStroke.Thickness = 1.5
 
 local StatusLabel = Instance.new("TextLabel", MainFrame)
-StatusLabel.Position = UDim2.new(0, 0, 0.55, 0)
-StatusLabel.Size = UDim2.new(1, 0, 0, 25)
+StatusLabel.Position = UDim2.new(0, 0, 0.7, 0)
+StatusLabel.Size = UDim2.new(1, 0, 0, 30)
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.Font = Enum.Font.GothamSemibold
-StatusLabel.Text = "SECURITY: ELITE ACTIVE"
-StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+StatusLabel.Text = "SPEED: MAXIMUM"
+StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
 StatusLabel.TextSize = 10
-
-local StaffLabel = Instance.new("TextLabel", MainFrame)
-StaffLabel.Position = UDim2.new(0, 0, 0.75, 0)
-StaffLabel.Size = UDim2.new(1, 0, 0, 25)
-StaffLabel.BackgroundTransparency = 1
-StaffLabel.Font = Enum.Font.Gotham
-StaffLabel.Text = "STAFF SCANNER: ON"
-StaffLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-StaffLabel.TextSize = 9
 
 -- [RGB LOGIC]
 task.spawn(function()
@@ -142,17 +121,20 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 end)
 
 -- ==========================================
--- LÓGICA DE ELITE FARM (TWEEN BYPASS + RAYCAST)
+-- LÓGICA DE AUTO MINING ULTRA RÁPIDA
 -- ==========================================
-local RAIO_OPERACAO = 150
-local DISTANCIA_ATAQUE = 8.0
+local RAIO_OPERACAO = 90
+local DISTANCIA_ATAQUE = 7.5
 local farmAtivo = false
 local lastSwing = 0
 
+-- [ULTRA SPEED] Intervalo de ataque reduzido ao limite
+local ATTACK_SPEED = 0.25 
+
 ToggleBtn.MouseButton1Click:Connect(function()
     farmAtivo = not farmAtivo
-    ToggleBtn.Text = farmAtivo and "ELITE ACTIVE" or "START ELITE FARM"
-    ToggleBtn.BackgroundColor3 = farmAtivo and Color3.fromRGB(100, 0, 0) or Color3.fromRGB(55, 0, 0)
+    ToggleBtn.Text = farmAtivo and "ULTRA FARMING..." or "START ULTRA FARM"
+    ToggleBtn.BackgroundColor3 = farmAtivo and Color3.fromRGB(120, 0, 0) or Color3.fromRGB(60, 0, 0)
 end)
 
 local function buscarFerramenta()
@@ -183,54 +165,35 @@ local function acharMelhorAlvo()
     return alvo
 end
 
--- [RAYCASTING] Validação de linha de visão para evitar kicks de "hit through wall"
-local function hasLineOfSight(target)
-    local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-    if not root then return false end
-    local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {Player.Character}
-    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-    local result = workspace:Raycast(root.Position, (target.Position - root.Position), rayParams)
-    return result == nil or result.Instance:IsDescendantOf(target.Parent)
-end
-
 task.spawn(function()
     while true do
         if farmAtivo then
             local char = Player.Character
             local root = char and char:FindFirstChild("HumanoidRootPart")
+            local humanoid = char and char:FindFirstChild("Humanoid")
             local tool = buscarFerramenta()
 
-            if root and tool then
+            if root and humanoid and tool then
                 local alvo = acharMelhorAlvo()
-                if alvo and hasLineOfSight(alvo) then
+                if alvo then
                     local dist = (root.Position - alvo.Position).Magnitude
-                    
                     if dist > DISTANCIA_ATAQUE then
-                        -- [TWEEN BYPASS] Movimentação suave com delay para evitar kicks de velocidade
-                        local tweenInfo = TweenInfo.new(dist / 50, Enum.EasingStyle.Linear)
-                        local tween = TweenService:Create(root, tweenInfo, {CFrame = CFrame.new(alvo.Position + Vector3.new(0, 3, 0), alvo.Position)})
-                        tween:Play()
-                        StatusLabel.Text = "TWEENING TO TARGET..."
-                        tween.Completed:Wait()
+                        humanoid:MoveTo(alvo.Position)
                     else
-                        root.Velocity = Vector3.new(0, 0, 0)
-                        if tool.Parent ~= char then char.Humanoid:EquipTool(tool) end
+                        humanoid:MoveTo(root.Position)
+                        if tool.Parent ~= char then humanoid:EquipTool(tool) end
                         
-                        -- [SMART WAIT] Intervalo inteligente baseado no ping
-                        local ping = 50 -- Valor padrão caso não consiga ler stats
-                        pcall(function()
-                            ping = tonumber(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString():split(" ")[1]) or 50
-                        end)
-                        local smartWait = 0.25 + (ping / 1000)
+                        -- Rotação Instantânea
+                        root.CFrame = CFrame.new(root.Position, Vector3.new(alvo.Position.X, root.Position.Y, alvo.Position.Z))
 
-                        if tick() - lastSwing > smartWait then
+                        -- [ULTRA SPEED] Ataque e Remotes em Massa
+                        if tick() - lastSwing > ATTACK_SPEED then
                             lastSwing = tick()
                             tool:Activate()
                             VirtualUser:CaptureController()
                             VirtualUser:ClickButton1(Vector2.new(0, 0))
                             
-                            -- Disparo de Remotes Protegido
+                            -- Disparo de Remotes Otimizado (3 pacotes por swing)
                             task.spawn(function()
                                 for i = 1, 3 do 
                                     for _, r in pairs(ReplicatedStorage:GetDescendants()) do
@@ -241,16 +204,15 @@ task.spawn(function()
                                             end
                                         end
                                     end
-                                    task.wait(0.05)
+                                    task.wait(0.03)
                                 end
                             end)
-                            StatusLabel.Text = "ELITE MINING..."
+                            StatusLabel.Text = "STATUS: ULTRA SPEED"
                         end
                     end
                 end
             end
         end
-        -- [WAIT INTELIGENTE] Evita sobrecarga e detecção de frequência
-        task.wait(0.02)
+        task.wait(0.01) -- Loop de alta frequência
     end
 end)
