@@ -1,5 +1,5 @@
 --[[
-    Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6)
+    Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6) - CORRIGIDO
     Interface: Dark Red Background + RGB Rainbow Borders
     Features: ORIGINAL AUTO-MINING + FAST AUTO SELL + ADVANCED TP
     Security: ANTI-KICK / ANTI-AFK / VERSION LOCK / AUTO-CLEAN
@@ -15,7 +15,6 @@ local UserInputService = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 
 -- [SISTEMA DE EXCLUSIVIDADE - LIMPEZA DE SCRIPTS ANTIGOS]
--- Este bloco identifica e remove qualquer GUI anterior do Sh4x para evitar conflitos
 local SCRIPT_VERSION = "SH4X_V6_FINAL"
 for _, gui in pairs(CoreGui:GetChildren()) do
     if gui:IsA("ScreenGui") and (gui:FindFirstChild("MainFrame") or gui.Name:find("Sh4x") or #gui.Name == 12) then
@@ -242,6 +241,7 @@ task.spawn(function()
     while true do
         if sellAtivo then
             pcall(function()
+                -- Tenta vender via Remotes globais primeiro
                 for _, r in pairs(ReplicatedStorage:GetDescendants()) do
                     if r:IsA("RemoteEvent") or r:IsA("RemoteFunction") then
                         local n = r.Name:lower()
@@ -250,13 +250,20 @@ task.spawn(function()
                         end
                     end
                 end
+                
+                -- Venda individual de itens do inventário
                 local char = Player.Character
                 for _, item in pairs(Player.Backpack:GetChildren()) do
-                    if item:IsA("Tool") and not item.Name:lower():find("pickaxe") then
+                    -- CORREÇÃO: Verifica se o item NÃO é a Picareta antes de equipar/vender
+                    -- Adicionada verificação por nome "Picareta" (conforme imagem) e "Pickaxe"
+                    local itemName = item.Name:lower()
+                    if item:IsA("Tool") and not (itemName:find("pickaxe") or itemName:find("picareta")) then
                         char.Humanoid:EquipTool(item)
                         task.wait(0.05)
                         for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                            if r:IsA("RemoteEvent") and (r.Name:lower():find("sell") or r.Name:lower():find("vender")) then r:FireServer(item) end
+                            if r:IsA("RemoteEvent") and (r.Name:lower():find("sell") or r.Name:lower():find("vender")) then 
+                                r:FireServer(item) 
+                            end
                         end
                     end
                 end
